@@ -7,23 +7,23 @@ var monthDays = daysInThisMonth(year,month);
 var months =["January","February","March","April","May","June","July","August","September","October","November","December"];
 var weekDaysDates = ["","","","","","",""];
 var daysString = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-var appointments = [["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-5-9-11:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-9-6:00-pm","doctorName","patient","visit","docId","patId","appId"],["2019-4-9-5:00-pm","doctorName","patient","visit","docId","patId","appId"]];
+var appointments = [["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","Tristan","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","Albert ","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","Edward","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-16-9:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-5-9-11:00-am","doctorName","patient","visit","docId","patId","appId"],["2019-4-9-6:00-pm","Abby","patient","visit","docId","patId","appId"],["2019-4-9-5:00-pm","doctorName","patient","visit","docId","patId","appId"]];
 var doctors = [
-  [["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
-  [["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
-  [["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
-  [["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
-  [["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
-  [["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
-  [["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
-  [["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
-  [["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
-  [["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
+  [["id"],["Shawn"],["lastName"],["1983/10/12"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
+  [["id"],["Abraham "],["lastName"],["1993/5/11"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
+  [["id"],["Todd"],["lastName"],["1973/10/12"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
+  [["id"],["Edwin "],["lastName"],["1993/4/22"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
+  [["id"],["Taylor"],["lastName"],["1984/11/12"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
+  [["id"],["Cleo"],["lastName"],["1975/2/12"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
+  [["id"],["name"],["lastName"],["1983/3/12"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
+  [["id"],["Elias"],["lastName"],["1987/6/12"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
+  [["id"],["Tanya"],["lastName"],["1973/1/12"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
+  [["id"],["Bilal"],["lastName"],["1985/1/10"],["nationality"],["address"],["speciality"]],[["id"],["name"],["lastName"],["birthDate"],["nationality"],["address"],["speciality"]],
 
 ];
 
 $(document).ready(function(){
-  transTab("dash");
+  transTab("clinic");
   addChart("chart1");
   addAppointmentModal();
   addDoctorModal();
@@ -1175,12 +1175,12 @@ function buildDoctorsListBody(){
   var calBody = buildDocListHeader();
   calendar.append(calBody);
   for (a in doctors) {
-    var emptDiv = $("<div/>").addClass("doctor_list_body").attr("doctors-list-Content",doctors[a][0]+"-"+doctors[a][0] +"-"+doctors[a][1]+"-"+ doctors[a][2] +"-"+doctors[a][3]);
+    var emptDiv = $("<div/>").addClass("doctor_list_body").attr("doctors-list-Content",doctors[a][1]+"-"+doctors[a][2] +"-"+doctors[a][6]+"-"+ doctors[a][5]);
     emptDiv.append("<div class='doctor_list_side calendar_hov'><div/>");
-    emptDiv.append("<div class='doctor_list_box'>"+doctors[a][0]+"<div/>");
     emptDiv.append("<div class='doctor_list_box'>"+doctors[a][1]+"<div/>");
     emptDiv.append("<div class='doctor_list_box'>"+doctors[a][2]+"<div/>");
-    emptDiv.append("<div class='doctor_list_box_last'>"+doctors[a][3]+"<div/>");
+    emptDiv.append("<div class='doctor_list_box'>"+doctors[a][6]+"<div/>");
+    emptDiv.append("<div class='doctor_list_box_last'>"+doctors[a][5]+"<div/>");
     calendar.append(emptDiv);
   }
   return calendar;
