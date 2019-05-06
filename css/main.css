@@ -1,0 +1,232 @@
+.clickable
+{
+    cursor: pointer;
+}
+
+.appointment-week-boxs{
+  display: inline-block;
+  width:auto;
+  border: 1px solid #858796;
+  border-radius: 5px;
+  background-color: #4e73df;
+  color:white;
+}
+
+.appointment-week-boxs:hover{
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.dropShadHov:hover{
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.appointment-day-boxs{
+  display: inline-block;
+  width:auto;
+  border: 1px solid #858796;
+  border-radius: 5px;
+}
+
+
+
+/*appointment monthly calender style*/
+  .monthly_calendar_body,
+  .monthly_calendar_header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  }
+  .monthly_calendar_body {
+  grid-auto-rows: 100px;
+  text-align: right;
+  }
+
+  .monthly_calendar_header {
+  grid-auto-rows: 50px;
+  align-items: center;
+  text-align: center;
+  }
+
+  .monthly_calendar_day_box {
+  padding: 16px;
+  }
+
+  .calendar_hov:hover {
+    background-color: #e3f2fd;
+  }
+
+  .weekly_calendar_body,
+  .weekly_calendar_header {
+    display: grid;
+    grid-template-columns:  repeat(8, 1fr);
+  }
+  .weekly_calendar_header {
+    grid-auto-rows: 40px;
+    align-items: center;
+    text-align: center;
+  }
+  .weekly_calendar_body {
+    grid-auto-rows: 60px;
+    text-align: right;
+  }
+  .weekly_calendar_box {
+    padding: 3px;
+    border-right: 1px solid #e1e1e1;
+    border-top: 1px solid #e1e1e1;
+  }
+  .weekly_calendar_header>div {
+    text-transform: uppercase;
+    font-size: 0.8em;
+    font-weight: bold;
+  }
+
+
+
+
+  /*appointment dayly calender style*/
+
+  .dayly_calendar_body,
+  .dayly_calendar_header {
+    display: grid;
+    grid-template-columns: 160px auto;
+  }
+  .dayly_calendar_header {
+    grid-auto-rows: 40px;
+    align-items: center;
+    text-align: center;
+  }
+  .dayly_calendar_body {
+    grid-auto-rows: 60px;
+    text-align: left;
+  }
+  .dayly_calendar_box {
+    padding: 3px;
+    border-right: 1px solid #e1e1e1;
+    border-top: 1px solid #e1e1e1;
+  }
+  .dayly_calendar_header>div {
+    text-transform: uppercase;
+    font-size: 0.8em;
+    font-weight: bold;
+  }
+
+
+  /*appointment list style*/
+
+  .appointment_list_body,
+  .appointment_list_header {
+    display: grid;
+    grid-template-columns: .2fr repeat(5, 1fr);
+  }
+  .appointment_list_header {
+    grid-auto-rows: 40px;
+    align-items: center;
+    text-align: center;
+  }
+  .appointment_list_body {
+    grid-auto-rows: 40px;
+    text-align: left;
+  }
+  .appointment_list_box {
+    padding: 3px;
+    border-right: 1px solid #e1e1e1;
+    border-top: 1px solid #e1e1e1;
+  }
+  .appointment_list_box_last {
+    padding: 3px;
+    border-top: 1px solid #e1e1e1;
+  }
+  .appointment_list_box_first_row {
+    padding: 3px;
+    border-right: 1px solid #e1e1e1;
+
+  }
+  .appointment_list_box_first_last {
+    padding: 3px;
+  }
+
+  .appointment_list_header>div {
+    text-transform: uppercase;
+    font-size: 0.8em;
+    font-weight: bold;
+  }
+  .appointment_list_side{
+    background-color: #448aff;
+    padding: 3px;
+    border-right: 1px solid #e1e1e1;
+    border-top: 1px solid #e1e1e1;
+  }
+
+
+
+
+  /*doctors list style*/
+
+  .doctor_list_body,
+  .doctor_list_header {
+    display: grid;
+    grid-template-columns: .2fr repeat(4, 1fr);
+  }
+  .doctor_list_header {
+    grid-auto-rows: 40px;
+    align-items: center;
+    text-align: center;
+  }
+  .doctor_list_body {
+    grid-auto-rows: 40px;
+    text-align: left;
+  }
+  .doctor_list_box {
+    padding: 3px;
+    border-right: 1px solid #e1e1e1;
+    border-top: 1px solid #e1e1e1;
+  }
+  .doctor_list_box_last {
+    padding: 3px;
+    border-top: 1px solid #e1e1e1;
+  }
+  .doctor_list_box_first_row {
+    padding: 3px;
+    border-right: 1px solid #e1e1e1;
+
+  }
+  .doctor_list_box_first_last {
+    padding: 3px;
+  }
+
+  .doctor_list_header>div {
+    text-transform: uppercase;
+    font-size: 0.8em;
+    font-weight: bold;
+  }
+  .doctor_list_side{
+    background-color: #448aff;
+    padding: 3px;
+    border-right: 1px solid #e1e1e1;
+    border-top: 1px solid #e1e1e1;
+  }
+
+
+
+  .calendar {
+    background-color: white;
+    border: 1px solid #e1e1e1;
+    max-height: 700px;
+    overflow: auto;
+  }
+
+  .monthly_calendar_header > div {
+  text-transform: uppercase;
+  font-size: 0.8em;
+  font-weight: bold;
+  }
+
+  .monthly_calendar_day_box {
+  border-right: 1px solid #e1e1e1;
+  border-top: 1px solid #e1e1e1;
+  }
+
+  .monthly_calendar_day_box:last-child {
+  border-right: 0;
+  }
+  .btn-warning-no-bg {
+  color: #fff;
+  border-color: #f6c23e !important;
+}
