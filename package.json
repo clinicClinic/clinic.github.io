@@ -4,7 +4,7 @@
   "description": "clinic system",
   "main": "gulpfile.js",
   "scripts": {
-    "start": "node nodeJsMain.js"
+    "start": "node node.js"
   },
   "keywords": [],
   "author": "",
