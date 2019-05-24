@@ -1,32 +1,101 @@
-
-$(document).ready(function(){
- //find the selected language
-   // !!fetch selected language
-   var lang = "en";
-   // text selector
-  var selectedLang = { en : {
-                            sideBarTitle: "Clinic ",
-                            dashboardMenu: "Dashboard",
-                            dividerHeading1: "My Clinic",
-                            doctorsMenuText: "Doctors",
-                            appointmentMenuTxt: "Appointments",
-                            patientMenuText: "Patients",
-                            monthlyIncomeCardTxt: "EARNINGS (MONTHLY)"
-                           },
-                    ar:   {
-                            sideBarTitle: "عيادة ",
-                            dashboardMenu: "الإحصائيات",
-                            dividerHeading1: "عيادتي",
-                            doctorsMenuText: "الأطباء",
-                            appointmentMenuTxt: "المواعيد",
-                            patientMenuText: "المراجعين",
-                            monthlyIncomeCardTxt: "(الأرباح (الشهرية"
-                           }
-                  };
-
-$(".isText").each(function(){
-  id = $(this).attr('id');
-  $(this).text(selectedLang[lang][id]);
-});
-
-});
+var llang = localStorage.getItem('lang');
+console.log(llang);
+if(llang){
+  var lang = llang;
+}
+else 
+  var lang = "ar";  
+// text selector
+var selectedLang = {
+  en: {
+    n0: "Clinic ",
+    n1: "Dashboard",
+    n2: "My Clinic",
+    n3: "Users",
+    n4: "Appointment",
+    n5: "Doctors",
+    n6: "Patients",
+    n7: "First name",
+    n8: "Last name",
+    n9: "Email",
+    n10: "Add User",
+    n11: "Password",
+    n12: "Confirm password",
+    n13: "Confirm Email",
+    n14: "Phone",
+    n15: "Role",
+    n16: "Confirm",
+    n17: "Login",
+    n18: "Logout",
+    n19: "Add Doctor",
+    n20: "Specialty",
+    n21: "nationality",
+    n22: "About",
+    n23: "Address",
+    n24: "Birth Date",
+    n25: "Add Appointment",
+    n26: "Date",
+    n27: "Comments",
+    n28: "Time",
+    n29: "Add Patient",
+    n30: "Edit",
+    n31: "Update",
+    n32: "Image",
+    n33: "Clinic Information",
+    n34: "Clinic Profile",
+    n35: "name",
+    n36: "Location",
+    n37: "Hour",
+    n38: "Visit",
+    n39: "Doctor",
+    n40: "Patient",
+    n41: "nationality",
+  },
+  ar: {
+    n0: "عيادة" ,
+    n1: "لوحة المعلومات" ,
+    n2: "عيادتي" ,
+    n3: "المستخدمون" ,
+    n4: "موعد" ,
+    n5: "الأطباء" ,
+    n6: "المرضى" ,
+    n7: "الاسم الأول" ,
+    n8: "اسم العائلة" ,
+    n9: "البريد الإلكتروني" ,
+    n10: "إضافة مستخدم" ,
+    n11: "كلمة المرور" ,
+    n12: "تأكيد كلمة المرور" ,
+    n13: "تأكيد البريد الإلكتروني" ,
+    n14: "الهاتف" ,
+    n15: "الدور" ,
+    n16: "تأكيد" ,
+    n17: "تسجيل الدخول" ,
+    n18: "تسجيل الخروج" ,
+    n19: "إضافة طبيب" ,
+    n20: "التخصص" ,
+    n21: "الجنسية" ,
+    n22: "حول" ,
+    n23: "العنوان" ,
+    n24: "تاريخ الميلاد" ,
+    n25: "إضافة موعد" ,
+    n26: "التاريخ" ,
+    n27: "تعليقات" ,
+    n28: "الوقت" ,
+    n29: "إضافة مريض" ,
+    n30: "تحرير" ,
+    n31: "تحديث" ,
+    n32: "صورة" ,
+    n33: "معلومات العيادة" ,
+    n34: "نبذة عن العيادة" ,
+    n35: "الاسم" ,
+    n36: "الموقع" ,
+    n37: "ساعة" ,
+    n38: "زيارة" ,
+    n39: "دكتور" ,
+    n40: "المريض" ,
+    n41: "الجنسية",
+  }
+};
+export function getText(nid) {
+  return selectedLang[lang][nid];
+}
