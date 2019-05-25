@@ -7,14 +7,21 @@ var jwt = require('jsonwebtoken');
 
 var PORT = process.env.PORT || 3000;
 
-var con = mysql.createConnection({
-  host: "eu-cdbr-west-02.cleardb.net",
-  user: "b692e07e1f51a6",
-  password: "c296d0a8",
-  database: "heroku_faf329674943f73"
-});
+// var con = mysql.createConnection({
+//   host: "eu-cdbr-west-02.cleardb.net",
+//   user: "b692e07e1f51a6",
+//   password: "c296d0a8",
+//   database: "heroku_faf329674943f73"
+// });
 
-con.connect();
+var pool  = mysql.createPool({
+    connectionLimit : 10,
+    host: "eu-cdbr-west-02.cleardb.net",
+    user: "b692e07e1f51a6",
+    password: "c296d0a8",
+    database: "heroku_faf329674943f73"
+});
+// con.connect();
 
 app.use(express.static(__dirname));
 app.use(bodyParser.json());
@@ -166,7 +173,7 @@ function hashPass(pass,callback){
 }
 function insertUser(user,callback){
   var sql = 'INSERT INTO users_2er31 (fname,lname,password,email,role,clinic_id,phone,added_by) values(?,?,?,?,?,?,?,?) ';
-  con.query(sql,[user.fname,user.lname,user.password,user.email,user.role,user.clinic_id,user.phone,user.added_by], function(error, results){    
+  pool.query(sql,[user.fname,user.lname,user.password,user.email,user.role,user.clinic_id,user.phone,user.added_by], function(error, results){    
     if (error) {
       if(error.code == "ER_DUP_ENTRY" || error.errno == 1062)
         callback('a user already exsit with '+user.email+' email');    
@@ -181,7 +188,7 @@ function insertUser(user,callback){
 }
 function checkUserCred(email,pass,callback){
   var sql = 'SELECT * FROM users_2er31 WHERE email = ? ';
-  con.query(sql,[email], function(error, results){
+  pool.query(sql,[email], function(error, results){
     if(error) throw error;
     //Load hash from your password DB.
     var hash = results[0].password;
@@ -209,10 +216,10 @@ function verifyToken(req,res,next){
 }
 function getClinicInfo(email,callback){
   var sql = 'SELECT clinic_id FROM users_2er31 WHERE email = ?';
-  con.query(sql,[email], function(error, resId){
+  pool.query(sql,[email], function(error, resId){
     if(error) throw error;
     sql1 = 'SELECT * FROM clinics WHERE id = ? ';
-    con.query(sql1,[resId[0].clinic_id], function(error, results){
+    pool.query(sql1,[resId[0].clinic_id], function(error, results){
       if(error) throw error;
       callback(results[0]);
     });
@@ -220,10 +227,10 @@ function getClinicInfo(email,callback){
 }
 function getClinicUsers(email,callback){
   var sql = 'SELECT clinic_id FROM users_2er31 WHERE email = ?';
-  con.query(sql,[email], function(error, resId){
+  pool.query(sql,[email], function(error, resId){
     if(error) throw error;
     sql1 = 'SELECT fname,lname,email,role FROM users_2er31 WHERE clinic_id = ? ';
-    con.query(sql1,[resId[0].clinic_id], function(error, results){
+    pool.query(sql1,[resId[0].clinic_id], function(error, results){
       if(error) throw error;
       callback(results);
     });
@@ -231,10 +238,10 @@ function getClinicUsers(email,callback){
 }
 function getClinicDoctors(email,callback){
   var sql = 'SELECT clinic_id FROM users_2er31 WHERE email = ?';
-  con.query(sql,[email], function(error, resId){
+  pool.query(sql,[email], function(error, resId){
     if(error) throw error;
     sql1 = 'SELECT doctors_12fdrv.id,user_id,fname,lname,specialty,gender,address FROM doctors_12fdrv inner join users_2er31 on doctors_12fdrv.user_id = users_2er31.id where clinic_id=? and role=4';
-    con.query(sql1,[resId[0].clinic_id], function(error, results){
+    pool.query(sql1,[resId[0].clinic_id], function(error, results){
       if(error) throw error;
       callback(results);
     });
@@ -242,10 +249,10 @@ function getClinicDoctors(email,callback){
 }
 function getClinicPatient(email,callback){
   var sql = 'SELECT clinic_id FROM users_2er31 WHERE email = ?';
-  con.query(sql,[email], function(error, resId){
+  pool.query(sql,[email], function(error, resId){
     if(error) throw error;
     sql1 = 'SELECT * FROM patients_j45bsc where clinic_id = ?';
-    con.query(sql1,[resId[0].clinic_id], function(error, results){
+    pool.query(sql1,[resId[0].clinic_id], function(error, results){
       if(error) throw error;
       callback(results);
     });
@@ -253,14 +260,14 @@ function getClinicPatient(email,callback){
 }
 function getAppointments(user,callback){
   var sql = 'SELECT * FROM appointments_3sd3df WHERE clinic_id = ?';
-  con.query(sql,[user.clinic_id], function(error, results){
+  pool.query(sql,[user.clinic_id], function(error, results){
     if (error) throw error;
     callback(results);
   });
 }
 function insertDoctor(user,doctor,callback){
   var sql = 'INSERT INTO users_2er31 (fname,lname,password,email,role,clinic_id,phone) values(?,?,?,?,?,?,?) ';
-  con.query(sql,[doctor.fname,doctor.lname,doctor.password,doctor.email,4,user.clinic_id,doctor.phone], function(error, results){    
+  pool.query(sql,[doctor.fname,doctor.lname,doctor.password,doctor.email,4,user.clinic_id,doctor.phone], function(error, results){    
     if (error) {
       if(error.code == "ER_DUP_ENTRY" || error.errno == 1062)
         callback('a user already exsit with '+user.email+' email');    
@@ -269,7 +276,7 @@ function insertDoctor(user,doctor,callback){
     }
     else{
       sql1 = 'INSERT INTO doctors_12fdrv (user_id, specialty, address, nationality, birth_date, added_by) values(?,?,?,?,?,?) ';
-      con.query(sql1,[results.insertId,doctor.specialty,doctor.address,doctor.nationality,doctor.birth_date,user.id], function(error, results){   
+      pool.query(sql1,[results.insertId,doctor.specialty,doctor.address,doctor.nationality,doctor.birth_date,user.id], function(error, results){   
         if(error) throw error;
         callback('Added Successfully');
        });    
@@ -279,17 +286,17 @@ function insertDoctor(user,doctor,callback){
 function insertAppointment(user,appointment,callback){
   var date = appointment.year + "-" + appointment.month + "-" + appointment.day + " " + appointment.hour + ":" + appointment.minutes + ":0";
   var sql = 'INSERT INTO appointments_3sd3df (doctor_id, clinic_id, patient_id, specialty, comment, date, isBy, added_by) VALUES (?,?,?,?,?,?,?,?)';  
-  con.query(sql,[appointment.doctor,user.clinic_id,appointment.patient,appointment.specialty,appointment.comment,date,0,user.id], function(error, results){ 
+  pool.query(sql,[appointment.doctor,user.clinic_id,appointment.patient,appointment.specialty,appointment.comment,date,0,user.id], function(error, results){ 
     if (error) throw error;
     callback("Added Successfully");
   });
 }
 function insertPatient(email,patient,callback){
   sql = ' SELECT id,clinic_id FROM users_2er31 WHERE email = ?';
-  con.query(sql,[email], function(error, results){ 
+  pool.query(sql,[email], function(error, results){ 
     if (error) throw error;
     sql0 = ' INSERT INTO patients_j45bsc(fname, lname, email, clinic_id, birth_date, nationality, added_by) VALUES (?,?,?,?,?,?,?)';
-    con.query(sql0,[patient.fname,patient.lname,patient.email,results[0].clinic_id,patient.birth_date,patient.nationality,results[0].id], function(error, ress){ 
+    pool.query(sql0,[patient.fname,patient.lname,patient.email,results[0].clinic_id,patient.birth_date,patient.nationality,results[0].id], function(error, ress){ 
       if (error) {
         if(error.code == "ER_DUP_ENTRY" || error.errno == 1062)
           callback('a paitent already exsit with '+email+' email');    

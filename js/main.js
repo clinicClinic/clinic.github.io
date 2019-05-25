@@ -342,26 +342,45 @@ function dashCont() {
 
 }
 function clinicCont() {
-  $("#contentFirstRow").append(buildAddPaitentCard());
-  req.getClinic(function(clinic){
-    req.getDoctors(function(doctors){
-      req.getClinicPatients(function(patients){
-        req.getAppointments(function(appointments){
-          localStorage.setItem('clinic',JSON.stringify(clinic));
-          localStorage.setItem('doctors',JSON.stringify(doctors));
-          localStorage.setItem('patients',JSON.stringify(patients));
-          localStorage.setItem('appointments',JSON.stringify(appointments));
-          $("#contentFirstRow").append(buildMyClinicCont(clinic));
-          $("#contentFirstRow").append(buildDocListCard(doctors));
-          $("#contentFirstRow").append(buildPatListCard(patients));
-          $("#contentFirstRow").append(buildAddAppointmentCard1(patients,doctors));
-          $("#contentFirstRow").append(buildAppointmentslistCard(appointments));
+
+  if(checkIfObjFound()){
+    var clinic = localStorage.getItem('clinic');
+    var doctors = localStorage.getItem('doctors');
+    var patients = localStorage.getItem('patients');
+    var appointments = localStorage.getItem('appointments');
+    clinic = JSON.parse(clinic);
+    doctors = JSON.parse(doctors);
+    patients = JSON.parse(patients);
+    appointments = JSON.parse(appointments);
+    $("#contentFirstRow").append(buildMyClinicCont(clinic));
+    $("#contentFirstRow").append(buildDocListCard(doctors));
+    $("#contentFirstRow").append(buildPatListCard(patients));
+    $("#contentFirstRow").append(buildAddAppointmentCard1(patients,doctors));
+    $("#contentFirstRow").append(buildAppointmentslistCard(appointments));
+    $("#contentFirstRow").append(buildAddPaitentCard());
+    $("#contentFirstRow").append(buildAddDoctorCard1());
+  }
+  else{
+    req.getClinic(function(clinic){
+      req.getDoctors(function(doctors){
+        req.getClinicPatients(function(patients){
+          req.getAppointments(function(appointments){
+            localStorage.setItem('clinic',JSON.stringify(clinic));
+            localStorage.setItem('doctors',JSON.stringify(doctors));
+            localStorage.setItem('patients',JSON.stringify(patients));
+            localStorage.setItem('appointments',JSON.stringify(appointments));
+            $("#contentFirstRow").append(buildMyClinicCont(clinic));
+            $("#contentFirstRow").append(buildDocListCard(doctors));
+            $("#contentFirstRow").append(buildPatListCard(patients));
+            $("#contentFirstRow").append(buildAddAppointmentCard1(patients,doctors));
+            $("#contentFirstRow").append(buildAppointmentslistCard(appointments));
+            $("#contentFirstRow").append(buildAddPaitentCard());
+            $("#contentFirstRow").append(buildAddDoctorCard1());
+          });
         });
-      });
+      }); 
     }); 
-  }); 
-  
-  $("#contentFirstRow").append(buildAddDoctorCard1());
+  }
 
 }
 function usersCont(){
@@ -1393,6 +1412,16 @@ function buildAddPaitentCard(){
   card.append(cardShadow);
   return card;
 }
+function checkIfObjFound(){
+  var clinic = localStorage.getItem('clinic');
+  var doctors = localStorage.getItem('doctors');
+  var patients = localStorage.getItem('patients');
+  var appointments = localStorage.getItem('appointments');
+  if(clinic && doctors && patients && appointments)
+    return true;
+  else 
+    return false;
+}
 //-------------------------------------------------------------------------my clinic related functions display appointment list + clinic profile ----------------------------------
 function buildAddAppointmentCard() {
   var heading = $("<h3/>").text("New Appointment +");
@@ -1530,6 +1559,7 @@ function appointmentListBody(appointments) {
   var calendar = $("<div/>").addClass("calendar");
   var calBody = buildAppointmentListHeader();
   calendar.append(calBody);
+  console.log(appointments);
 
   for (a in appointments) {
     var date = appointments[a].date.split("T");

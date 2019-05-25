@@ -1,3 +1,5 @@
+import * as req from './req.js';
+
 export function getPatient(id){
     var patients = localStorage.getItem('patients');
     patients = JSON.parse(patients);
@@ -35,7 +37,6 @@ export function getPatAppointments(id){
         return tempApp;
     }   
 }
-
 export function getDocAppointments(id){
     var appointments = localStorage.getItem('appointments');
     appointments = JSON.parse(appointments);
