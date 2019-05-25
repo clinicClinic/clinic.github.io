@@ -1213,6 +1213,7 @@ function buildLoginCard(){
 }
 function buildSideBarItems(){
   var user = localStorage.getItem('user');
+  if(!user) return;
   user = JSON.parse(user);
   var role = user.role;
   $("#sideBar").html('');
