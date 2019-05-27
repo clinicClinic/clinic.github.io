@@ -39,7 +39,7 @@ app.post('/login',function(req, res){
     }
   });
 });
-app.post('mobile/login',function(req, res){
+app.post('/mobile/login',function(req, res){
   //get the user  hash 
   checkUserCred(req.body.email,req.body.password,function(valid,cuser){
     if(valid){
