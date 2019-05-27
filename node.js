@@ -39,6 +39,20 @@ app.post('/login',function(req, res){
     }
   });
 });
+app.post('mobile/login',function(req, res){
+  //get the user  hash 
+  checkUserCred(req.body.email,req.body.password,function(valid,cuser){
+    if(valid){
+      //create token
+      jwt.sign({ user: req.body }, "privateKey", {expiresIn:"1h"}, function(err, token) {
+        res.send('{"'+token +'":,"'+ cuser+'"}');
+      });
+    }
+    else{
+      res.send('invalid user or password');
+    }
+  });
+});
 app.post('/reg',verifyToken,function(req, res){
   jwt.verify(req.token,'privateKey',function(err0,authData){
     if(err0){
