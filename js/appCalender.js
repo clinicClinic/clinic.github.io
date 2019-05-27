@@ -7,7 +7,6 @@ var monthDays = daysInThisMonth(year, month);
 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 var weekDaysDates = ["", "", "", "", "", "", ""];
 var daysString = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-var appointments = [["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "Tristan", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "Albert ", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "Edward", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-16-9:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-5-9-11:00-am", "doctorName", "patient", "visit", "docId", "patId", "appId"], ["2019-4-9-6:00-pm", "Abby", "patient", "visit", "docId", "patId", "appId"], ["2019-4-9-5:00-pm", "doctorName", "patient", "visit", "docId", "patId", "appId"]];
 
 import * as lns from './lanSelector.js';
 import * as obj from './obj.js';
@@ -48,11 +47,11 @@ $(document).on("click", ".monthsBtn", function () {
 });
 $(document).on("click", ".calWeeksNext", function () {
   changeWeekCal("nxt");
-  buildWeekscalendar(8, 24, 0);
+  buildWeekscalendar(0, 24, 0);
 });
 $(document).on("click", ".calWeeksPrev", function () {
   changeWeekCal("prev");
-  buildWeekscalendar(8, 24, 0);
+  buildWeekscalendar(0, 24, 0);
 });
 $(document).on("click", ".dayBtn", function () {
   daycalendar();
@@ -179,6 +178,8 @@ function buildCalWeek(dayStart) {
   //return the blocks as string
   return '<div class="monthly_calendar_body">' + days + '</div>';
 }
+//------------------------------------------------------------------------------------------- dayly calender functions
+
 function daycalendar() {
 
   var weekBtn = $("<a/>").addClass("weeksBtn btn-sm animated-button thar-one").text(lns.getText('n53'));
@@ -267,11 +268,6 @@ function buildDaylycalendar() {
   calendar.append(calBody);
 
   return calendar;
-}
-//this function return the number of days in the giving month and year
-function daysInThisMonth(year, month) {
-  var now = new Date();
-  return new Date(year, month + 1, 0).getDate();
 }
 //------------------------------------------------------------------weekly calendar------------------------------------------------------------------
 //this function renders the weeklly calendar
@@ -367,6 +363,7 @@ function buildWeeksCalHelper() {
 
 
 }
+//---------------------------------------------------------------- transation managers + helpers
 function changeDay(chng) {
   if (chng == "inc") {
     day++;
@@ -420,7 +417,13 @@ function changeWeekCal(chng) {
       weekDaysDates[i] = year + "-" + month  + "-" + day;
     }
   }
-}//
+}
+//this function return the number of days in the giving month and year
+function daysInThisMonth(year, month) {
+  var now = new Date();
+  return new Date(year, month + 1, 0).getDate();
+}
+//----------------------------------------------------------------- rendering appointment in the calender
 //rendering the appointments
 function renderWeeksAppointments() {
   var a;
@@ -471,7 +474,6 @@ function renderDaysAppointments() {
     elmnt.attr("appointmentCount", count);
   }
 }
-
 //rendering the appointments
 function renderMonthAppointments() {
   var appointments = localStorage.getItem('appointments');

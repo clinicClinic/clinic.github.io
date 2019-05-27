@@ -56,6 +56,7 @@ $(document).ready(function () {
     $(".edtProfBtn").show();
   });
   $(document).on("click", ".docCardClick", function () {
+    $("#appendTopBox").html('');
     var id = $(this).attr('profileid');
     var appointments = obj.getDocAppointments(id);
     $("#contentFirstRow").html("");
@@ -63,6 +64,7 @@ $(document).ready(function () {
     $("#contentFirstRow").append(buildAppointmentslistCard(appointments));
   });
   $(document).on("click", ".patCardClick", function () {
+    $("#appendTopBox").html('');
     var id = $(this).attr('profileid');
     var appointments = obj.getPatAppointments(id);
     $("#contentFirstRow").html("");
@@ -71,6 +73,7 @@ $(document).ready(function () {
   });
   $(document).on("click", ".appCardClick", function (event) {
     event.stopPropagation();
+    $("#appendTopBox").html('');
     var id = $(this).attr('appointmentId');
     var appointment = obj.getAppointment(id);
     $("#contentFirstRow").html("");
@@ -78,10 +81,6 @@ $(document).ready(function () {
   });
   $(document).on("click", ".addNewDoctorCard", function () {
     buildEmptyDoctorProfile(0);
-  });
-  $(document).on("click", ".isCalWeekCell ", function () {
-
-    $("#addAppointmentModal").modal("show");
   });
   $(document).on("click", ".toggleAppointmentCard", function (event) {
     event.stopPropagation();
@@ -121,6 +120,7 @@ $(document).ready(function () {
     });
   });
   $(document).on("click", ".addNewUserBtn", function () {
+    $("#appendTopBox").html('');
     var user = localStorage.getItem('user');
     user = JSON.parse(user);
     var cid = user.clinic_id;
@@ -172,7 +172,6 @@ $(document).ready(function () {
         var tmp = token.split(" ");
         localStorage.setItem('user', tmp[1]);
         localStorage.setItem("token", token);
-        $("#userName").text(tmp[1].fname+" "+tmp[1].lname);
         checkIfLoggedIn();
       });
     } else {
@@ -292,6 +291,7 @@ $(document).ready(function () {
   });
 });
 function checkIfLoggedIn() {
+  $("#appendTopBox").html('');
   var tokenTemp = localStorage.getItem("token");
   if (tokenTemp == '' || !tokenTemp) {
     $("#contentFirstRow").html(buildLoginCard());
@@ -303,6 +303,9 @@ function checkIfLoggedIn() {
   }
 }
 function displayCont() {
+  var user = localStorage.getItem('user');
+  var user = JSON.parse(user);
+  $("#userName").text(user.fname+" "+user.lname);
   buildSideBarItems();
   transTab("clinic");
 }
@@ -374,6 +377,7 @@ function dashCont() {
 
 }
 function clinicCont() {
+  $('#appendTopBox').html('<div class="spinner-border text-success" role="status"><span class="sr-only">Loading...</span></div>');
   loadClinicData(function(){
     var clinic = localStorage.getItem('clinic');
     var doctors = localStorage.getItem('doctors');
@@ -390,6 +394,7 @@ function clinicCont() {
     $("#contentFirstRow").append(buildPatListCard(patients));
     $("#contentFirstRow").append(buildAddPaitentCard());
     $("#contentFirstRow").append(buildAddDoctorCard1());
+    $('#appendTopBox').html("");
   });
 }
 function usersCont() {
@@ -1255,7 +1260,7 @@ function buildAddAppointmentCard1(patients, doctors) {
 
   var h = '<select name="hour" class="addNewAppInp form-control col-sm-2">';
   for (var i = 0; i < 24; i++) {
-    h += '<option value="' + i + '">' + (i + 1) + '</option>';
+    h += '<option value="' + i + '">' + i + '</option>';
   }
   h += '</select>';
 
