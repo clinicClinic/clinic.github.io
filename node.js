@@ -45,7 +45,7 @@ app.post('/mobile/login',function(req, res){
     if(valid){
       //create token
       jwt.sign({ user: req.body }, "privateKey", {expiresIn:"1h"}, function(err, token) {
-        res.send('{"'+token +'":,"'+ cuser+'"}');
+        res.send('{"token":"'+token +'","user":'+ cuser+'}');
       });
     }
     else{
