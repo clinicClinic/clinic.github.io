@@ -93,7 +93,7 @@
     text-align: center;
   }
   .dayly_calendar_body {
-    grid-auto-rows: 60px;
+    grid-auto-rows: 70px;
     text-align: left;
   }
   .dayly_calendar_box {

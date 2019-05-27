@@ -42,7 +42,7 @@ app.post('/login',function(req, res){
 app.post('/reg',verifyToken,function(req, res){
   jwt.verify(req.token,'privateKey',function(err0,authData){
     if(err0){
-      if(err0) throw err0;
+        res.sendStatus(403);
     }
     else{
       hashPass(req.body.nuser.password,function(err,hash){
@@ -50,7 +50,7 @@ app.post('/reg',verifyToken,function(req, res){
         var user = req.body.nuser;
         user['clinic_id'] = req.body.user.clinic_id;
         user['added_by'] = req.body.user.id;
-        req.body.user.password = hash;
+        user.password = hash;
         insertUser(user,function(results){
           res.send(results);
         });
@@ -160,6 +160,19 @@ app.post('/clinic/addPatient',verifyToken,function(req, res){
     }
   });
 });
+
+app.post('/clinic/deleteUser',verifyToken,function(req, res){
+    jwt.verify(req.token,'privateKey',function(err,authData){
+      if(err){
+        res.sendStatus(403);
+      }
+      else{
+        deleteUser(req.body.id,function(result){
+            res.send(result);
+        }); 
+      }
+    });
+  });
 app.listen(PORT,function(){
   console.log('server listning on port'+ PORT);
 });
@@ -229,7 +242,7 @@ function getClinicUsers(email,callback){
   var sql = 'SELECT clinic_id FROM users_2er31 WHERE email = ?';
   pool.query(sql,[email], function(error, resId){
     if(error) throw error;
-    sql1 = 'SELECT fname,lname,email,role FROM users_2er31 WHERE clinic_id = ? ';
+    sql1 = 'SELECT id,fname,lname,email,role FROM users_2er31 WHERE clinic_id = ? ';
     pool.query(sql1,[resId[0].clinic_id], function(error, results){
       if(error) throw error;
       callback(results);
@@ -266,8 +279,8 @@ function getAppointments(user,callback){
   });
 }
 function insertDoctor(user,doctor,callback){
-  var sql = 'INSERT INTO users_2er31 (fname,lname,password,email,role,clinic_id,phone) values(?,?,?,?,?,?,?) ';
-  pool.query(sql,[doctor.fname,doctor.lname,doctor.password,doctor.email,4,user.clinic_id,doctor.phone], function(error, results){    
+  var sql = 'INSERT INTO users_2er31 (fname,lname,password,email,role,clinic_id,phone,added_by) values(?,?,?,?,?,?,?,?) ';
+  pool.query(sql,[doctor.fname,doctor.lname,doctor.password,doctor.email,4,user.clinic_id,doctor.phone,user.id], function(error, results){    
     if (error) {
       if(error.code == "ER_DUP_ENTRY" || error.errno == 1062)
         callback('a user already exsit with '+user.email+' email');    
@@ -275,8 +288,8 @@ function insertDoctor(user,doctor,callback){
         throw error;
     }
     else{
-      sql1 = 'INSERT INTO doctors_12fdrv (user_id, specialty, address, nationality, birth_date, added_by) values(?,?,?,?,?,?) ';
-      pool.query(sql1,[results.insertId,doctor.specialty,doctor.address,doctor.nationality,doctor.birth_date,user.id], function(error, results){   
+      sql1 = 'INSERT INTO doctors_12fdrv (user_id, specialty, address, nationality, birth_date,gender, added_by) values(?,?,?,?,?,?,?) ';
+      pool.query(sql1,[results.insertId,doctor.specialty,doctor.address,doctor.nationality,doctor.birth_date,doctor.gender,user.id], function(error, results){   
         if(error) throw error;
         callback('Added Successfully');
        });    
@@ -295,8 +308,8 @@ function insertPatient(email,patient,callback){
   sql = ' SELECT id,clinic_id FROM users_2er31 WHERE email = ?';
   pool.query(sql,[email], function(error, results){ 
     if (error) throw error;
-    sql0 = ' INSERT INTO patients_j45bsc(fname, lname, email, clinic_id, birth_date, nationality, added_by) VALUES (?,?,?,?,?,?,?)';
-    pool.query(sql0,[patient.fname,patient.lname,patient.email,results[0].clinic_id,patient.birth_date,patient.nationality,results[0].id], function(error, ress){ 
+    sql0 = ' INSERT INTO patients_j45bsc(fname, lname, email, clinic_id, birth_date, nationality, phone,added_by) VALUES (?,?,?,?,?,?,?,?)';
+    pool.query(sql0,[patient.fname,patient.lname,patient.email,results[0].clinic_id,patient.birth_date,patient.nationality,patient.phone,results[0].id], function(error, ress){ 
       if (error) {
         if(error.code == "ER_DUP_ENTRY" || error.errno == 1062)
           callback('a paitent already exsit with '+email+' email');    
@@ -308,4 +321,11 @@ function insertPatient(email,patient,callback){
     });
   });
   
+}
+function deleteUser(id,callback){
+    sql = ' delete FROM users_2er31 WHERE id = ?';
+    pool.query(sql,id, function(error, results){ 
+        if (error) throw error;
+        callback("Deleted Successfully");     
+    });
 }

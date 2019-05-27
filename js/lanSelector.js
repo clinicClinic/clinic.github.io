@@ -1,5 +1,4 @@
 var llang = localStorage.getItem('lang');
-console.log(llang);
 if(llang){
   var lang = llang;
 }
@@ -49,7 +48,23 @@ var selectedLang = {
     n38: "Visit",
     n39: "Doctor",
     n40: "Patient",
-    n41: "nationality",
+    n41: "Nationality",
+    n42: "Appointments",
+    n43: "City",
+    n44: "Doctor Information",
+    n45: "Patient Information",
+    n46: "Patient Profile",
+    n47: "Doctor Profile",
+    n48: "Gender",
+    n49: "Added By",
+    n50: "Appointment Information",
+    n51: "2 : This user can access everything except the dashboard panel",
+    n52: "3 : This user can access everything except the dashboard and users panels",
+    n53: "Weeks",
+    n54: "Months",
+    n55: "Days",
+    n56: "Previous",
+    n57: "Next",
   },
   ar: {
     n0: "عيادة" ,
@@ -94,7 +109,23 @@ var selectedLang = {
     n39: "دكتور" ,
     n40: "المريض" ,
     n41: "الجنسية",
-  }
+    n42: "المواعيد",
+    n43: "المدينة",
+    n44: "معلومات الطبيب" ,
+    n45: "معلومات المريض" ,
+    n46: "ملف المريض" ,
+    n47: "ملف الطبيب" ,
+    n48: "جنس",
+    n49: "أضيف بواسطة",
+    n50: "معلومات الموعد" ,
+    n51: "2: يمكن لهذا المستخدم الوصول إلى كل شيء ما عدا لوحة المعلومات" ,
+    n52: "3: يمكن لهذا المستخدم الوصول إلى كل شيء ما عدا لوحة المعلومات ولوحة المستخدمين" ,
+    n53: "أسابيع" ,
+    n54: "أشهر" ,
+    n55: "أيام" ,
+    n56: "السابق" ,
+    n57: "التالي" ,  
+}
 };
 export function getText(nid) {
   return selectedLang[lang][nid];

@@ -22,7 +22,7 @@ export function getClinic(callback){
             callback(result);
         },
         error: function(data){
-            localStorage.setItem('token','');
+            localStorage. localStorage.setItem('token','');
             location.reload();
         }
     });
@@ -40,7 +40,7 @@ export function getClinicUsers(callback){
             callback(result);
         },
         error: function(data){
-            localStorage.setItem('token','');
+            localStorage. localStorage.setItem('token','');
             location.reload();
         }
     });
@@ -58,7 +58,7 @@ export function getClinicPatients(callback){
             callback(result);
         },
         error: function(data){
-            localStorage.setItem('token','');
+            localStorage. localStorage.setItem('token','');
             location.reload();
         }
     });
@@ -75,6 +75,12 @@ export function addUser(data,callback){
         contentType:'application/json',
         success: function(result){
           callback(result);
+        },
+        statusCode: {
+            403: function() {
+                 localStorage.setItem("token","");
+                location.reload();
+            }
         }
       });
 }
@@ -90,6 +96,12 @@ export function addDoctor(data,callback){
         contentType:'application/json',
         success: function(result){
           callback(result);
+        },
+        statusCode: {
+            403: function() {
+                 localStorage.setItem("token","");
+                location.reload();
+            }
         }
       });
 }
@@ -104,6 +116,12 @@ export function getDoctors(callback){
         contentType:'application/json',
         success: function(result){
           callback(result);
+        },
+        statusCode: {
+            403: function() {
+                 localStorage.setItem("token","");
+                location.reload();
+            }
         }
       });
 }
@@ -121,6 +139,12 @@ export function getAppointments(callback){
         contentType:'application/json',
         success: function(result){
           callback(result);
+        },
+        statusCode: {
+            403: function() {
+                 localStorage.setItem("token","");
+                location.reload();
+            }
         }
       });
 }
@@ -136,6 +160,12 @@ export function addAppointment(data,callback){
         contentType:'application/json',
         success: function(result){
           callback(result);
+        },
+        statusCode: {
+            403: function() {
+                 localStorage.setItem("token","");
+                location.reload();
+            }
         }
       });
 }
@@ -151,8 +181,35 @@ export function addPatient(data,callback){
         contentType:'application/json',
         success: function(result){
           callback(result);
+        },
+        statusCode: {
+            403: function() {
+               localStorage. localStorage.setItem("token","");
+                location.reload();
+            }
         }
       });
      
+}
+export function deleteUser(data,callback){
+    var bearerToken = 'bearer '+ localStorage.getItem('token') ;
+    $.ajax({
+        url: "/clinic/deleteUser",
+        type: "POST",
+        beforeSend: function(request) {
+            request.setRequestHeader('authorization', bearerToken);
+        },
+        data: data,
+        contentType:'application/json',
+        success: function(result){
+          callback();
+        },
+        statusCode: {
+            403: function() {
+                 localStorage.setItem("token","");
+                location.reload();
+            }
+        }
+      });
 }
 
