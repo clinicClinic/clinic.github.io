@@ -299,6 +299,7 @@ $(document).ready(function () {
     buildEditAppointmentCard(appointment,patients,doctors);
   });
   $(document).on("click", ".editAppInpBtn", function () {
+    
     var id = $(this).attr("aid");
     var err = false;
     var s = '{';
