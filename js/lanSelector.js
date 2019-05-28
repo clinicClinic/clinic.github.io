@@ -65,6 +65,7 @@ var selectedLang = {
     n55: "Days",
     n56: "Previous",
     n57: "Next",
+    n58: "Add",
   },
   ar: {
     n0: "عيادة" ,
@@ -124,7 +125,9 @@ var selectedLang = {
     n54: "أشهر" ,
     n55: "أيام" ,
     n56: "السابق" ,
-    n57: "التالي" ,  
+    n57: "التالي" , 
+    n58: "أضف",
+
 }
 };
 export function getText(nid) {

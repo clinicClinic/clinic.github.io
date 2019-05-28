@@ -162,6 +162,18 @@ app.post('/clinic/addAppointment',verifyToken,function(req, res){
     }
   });
 });
+app.post('/clinic/editAppointment',verifyToken,function(req, res){
+  jwt.verify(req.token,'privateKey',function(err,authData){
+    if(err){
+      res.sendStatus(403);
+    }
+    else{
+      editAppointment(req.body.user,req.body.appointment,function(result){
+      res.send(result);
+      }); 
+    }
+  });
+});
 app.post('/clinic/addPatient',verifyToken,function(req, res){
   jwt.verify(req.token,'privateKey',function(err,authData){
     if(err){
@@ -174,7 +186,6 @@ app.post('/clinic/addPatient',verifyToken,function(req, res){
     }
   });
 });
-
 app.post('/clinic/deleteUser',verifyToken,function(req, res){
     jwt.verify(req.token,'privateKey',function(err,authData){
       if(err){
@@ -186,7 +197,7 @@ app.post('/clinic/deleteUser',verifyToken,function(req, res){
         }); 
       }
     });
-  });
+});
 app.listen(PORT,function(){
   console.log('server listning on port'+ PORT);
 });
@@ -316,6 +327,14 @@ function insertAppointment(user,appointment,callback){
   pool.query(sql,[appointment.doctor,user.clinic_id,appointment.patient,appointment.specialty,appointment.comment,date,0,user.id], function(error, results){ 
     if (error) throw error;
     callback("Added Successfully");
+  });
+}
+function editAppointment(user,appointment,callback){
+  var date = appointment.year + "-" + appointment.month + "-" + appointment.day + " " + appointment.hour + ":" + appointment.minutes + ":0";
+  var sql = 'UPDATE appointments_3sd3df Set doctor_id=? , patient_id=? , specialty=? , date=? , added_by=? WHERE id=?';  
+    pool.query(sql,[appointment.doctor,appointment.patient,appointment.specialty,date,user.id,appointment.id], function(error, results){ 
+    if (error) throw error;
+    callback("Edited Successfully");
   });
 }
 function insertPatient(email,patient,callback){

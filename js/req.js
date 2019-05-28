@@ -212,4 +212,24 @@ export function deleteUser(data,callback){
         }
       });
 }
-
+export function editAppointment(data,callback){
+    var bearerToken = 'bearer '+ localStorage.getItem('token');
+    $.ajax({
+        url: "/clinic/editAppointment",
+        type: "POST",
+        beforeSend: function(request) {
+            request.setRequestHeader('authorization', bearerToken);
+        },
+        data:data,
+        contentType:'application/json',
+        success: function(result){
+          callback(result);
+        },
+        statusCode: {
+            403: function() {
+                localStorage.setItem("token","");
+                location.reload();
+            }
+        }
+      });
+}
