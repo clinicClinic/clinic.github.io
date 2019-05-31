@@ -1721,15 +1721,6 @@ function buildUsersListBody(clinicUsers) {
 
 
 
-
-
-mysql://b692e07e1f51a6:c296d0a8@eu-cdbr-west-02.cleardb.net/heroku_faf329674943f73?reconnect=true
-
-
-
-
-
-
 function buildEditAppointmentCard2(appointment, patients, doctors) {
 
   var row = $("<div/>").addClass("row");
