@@ -79,9 +79,6 @@ $(document).ready(function () {
     $("#contentFirstRow").html("");
     $("#contentFirstRow").append(buildAppointmentCard(appointment));
   });
-  $(document).on("click", ".addNewDoctorCard", function () {
-    buildEmptyDoctorProfile(0);
-  });
   $(document).on("click", ".toggleAppointmentCard", function (event) {
     event.stopPropagation();
     var patients = localStorage.getItem('patients');
@@ -89,7 +86,9 @@ $(document).ready(function () {
     docotors = JSON.parse(docotors);
     patients = JSON.parse(patients);
     $("#appendTopBox").html('');
-    $("#appendTopBox").append(buildAddAppointmentCard(patients, docotors));
+    $("#appendTopBox").append(buildAddAppointmentCard(patients, docotors, true));
+    $("#appointmentModal").modal("show");
+
   });
   $(document).on("click", ".toggleAddDoctorModal", function (event) {
 
@@ -296,10 +295,11 @@ $(document).ready(function () {
     var patients = localStorage.getItem('patients');
     patients = JSON.parse(patients);
     doctors = JSON.parse(doctors);
-    buildEditAppointmentCard(appointment,patients,doctors);
+    buildEditAppointmentCard(appointment, patients, doctors);
+
   });
   $(document).on("click", ".editAppInpBtn", function () {
-    
+
     var id = $(this).attr("aid");
     var err = false;
     var s = '{';
@@ -328,7 +328,7 @@ $(document).ready(function () {
       cAlert('Empty Field');
     }
   });
-  
+
 
 });
 function checkIfLoggedIn() {
@@ -348,34 +348,34 @@ function displayCont() {
   var user = JSON.parse(user);
   $("#userName").text(user.fname + " " + user.lname);
   buildSideBarItems();
-  transTab("clinic");
+  transTab("clnd");
 }
 function transTab(nxt) {
   $(".isNav").removeClass("active");
   $("#contentFirstRow").html("");
   $("#appendTopBox").html("");
-  if (nxt == "dash") {
-    dashCont();
-    addChart("chart1");
-  }
-  else if (nxt == "clinic") {
-    clinicCont();
-  }
-  else if (nxt == "clnd") {
-    appo.rend();
-    // cld = appointmentCont();
-    // $("#contentFirstRow").append(cld);
-    // renderMonthAppointments();
-  }
-  else if (nxt == "pat") {
-    patintCont();
-  }
-  else if (nxt == "doc") {
-    doctorsCont();
-  }
-  else if (nxt == "users") {
-    usersCont();
-  }
+  loadClinicData(function () {
+    if (nxt == "dash") {
+      dashCont();
+      addChart("chart1");
+    }
+    else if (nxt == "clinic") {
+      clinicCont();
+    }
+    else if (nxt == "clnd") {
+      appo.rend();
+    }
+    else if (nxt == "pat") {
+      patintCont();
+    }
+    else if (nxt == "doc") {
+      doctorsCont();
+    }
+    else if (nxt == "users") {
+      usersCont();
+    }
+  });
+
 }
 function checkFields() {
 }
@@ -418,25 +418,23 @@ function dashCont() {
 
 }
 function clinicCont() {
-  $('#appendTopBox').html('<div class="spinner-border text-success" role="status"><span class="sr-only">Loading...</span></div>');
-  loadClinicData(function () {
-    var clinic = localStorage.getItem('clinic');
-    var doctors = localStorage.getItem('doctors');
-    var patients = localStorage.getItem('patients');
-    var appointments = localStorage.getItem('appointments');
-    clinic = JSON.parse(clinic);
-    doctors = JSON.parse(doctors);
-    patients = JSON.parse(patients);
-    appointments = JSON.parse(appointments);
-    $("#contentFirstRow").append(buildAddAppointmentCard(patients, doctors));
-    $("#contentFirstRow").append(buildAppointmentslistCard(appointments));
-    $("#contentFirstRow").append(buildMyClinicCont(clinic));
-    $("#contentFirstRow").append(buildDocListCard(doctors));
-    $("#contentFirstRow").append(buildPatListCard(patients));
-    $("#contentFirstRow").append(buildAddPaitentCard());
-    $("#contentFirstRow").append(buildAddDoctorCard1());
-    $('#appendTopBox').html("");
-  });
+  $('#loadingIcon').show('');
+  var clinic = localStorage.getItem('clinic');
+  var doctors = localStorage.getItem('doctors');
+  var patients = localStorage.getItem('patients');
+  var appointments = localStorage.getItem('appointments');
+  clinic = JSON.parse(clinic);
+  doctors = JSON.parse(doctors);
+  patients = JSON.parse(patients);
+  appointments = JSON.parse(appointments);
+  $("#contentFirstRow").append(buildAddAppointmentCard(patients, doctors, false));
+  $("#contentFirstRow").append(buildAppointmentslistCard(appointments));
+  $("#contentFirstRow").append(buildMyClinicCont(clinic));
+  $("#contentFirstRow").append(buildDocListCard(doctors));
+  $("#contentFirstRow").append(buildPatListCard(patients));
+  $("#contentFirstRow").append(buildAddPaitentCard());
+  $("#contentFirstRow").append(buildAddDoctorCard1());
+  $('#loadingIcon').hide();
 }
 function usersCont() {
   var users = localStorage.getItem('users');
@@ -925,149 +923,6 @@ function buildPatientProfile(id) {
 
   return card;
 }
-function buildEmptyDoctorProfile(docIndex) {
-
-  var headingEmpty1 = $("<h5/>").addClass("m-0 font-weight-bold ");
-  var headingEmpty2 = $("<h5/>").addClass("m-0 font-weight-bold ");
-
-  var aBtnEdit = $("<a/>").addClass("edtProfBtn btn-sm animated-button thar-one").css({ "display": "none" }).append("<span/>").text("Edit");
-  var aBtnUpdate = $("<a/>").addClass("updtProfBtn btn-sm animated-button thar-three").append("<span/>").text("Update");
-
-  var col0 = $("<div/>").addClass("col-md-5");
-  var col2 = $("<div/>").addClass("col-md-2");
-  var col1 = $("<div/>").addClass("col-md-5");
-
-  col0.append(headingEmpty1);
-  col1.append(headingEmpty2);
-
-  col2.append(aBtnUpdate);
-  col2.append(aBtnEdit);
-
-  var row0 = $("<div/>").addClass("row");
-  row0.append(col0);
-  row0.append(col1);
-  row0.append(col2);
-
-  var divider = $("<hr/>").addClass("sidebar-divider");
-
-  var h2 = $("<h2/>").append("<span/>").text("Image");
-  var br0 = $("<br/>");
-  var img = $("<img/>").addClass("img-profile rounded-circle").attr("src", "img/img_491471.png").attr("height", "150").attr("width", "150");
-
-  var center = $("<center/>");
-  var col_11_0 = $("<div/>").addClass("col-lg-2");
-  center.append(h2);
-  center.append(br0);
-
-  center.append(img);
-  col_11_0.append(center);
-
-  var h2Info = $("<h2/>").append("<span/>").text("Doctor Information");
-  var br1 = $("<br/>");
-  var col_11_1 = $("<div/>").addClass("col-lg-10");
-  col_11_1.append(h2Info);
-  col_11_1.append(br1);
-  col_11_1.append(divider);
-  col_11_1.append(buildTxtFeild("profNameInp", "Name", "", 1));
-  col_11_1.append(divider.clone());
-  col_11_1.append(buildTxtFeild("profNameInp", "City", "", 1));
-  col_11_1.append(divider.clone());
-  col_11_1.append(buildTxtFeild("profNameInp", "Phone Number", "", 1));
-  col_11_1.append(divider.clone());
-  col_11_1.append(buildTextArea("profNameInp", "about", "", 1));
-  col_11_1.append(divider.clone());
-  col_11_1.append(row0);
-
-  var row2 = $("<div/>").addClass("row");
-  row2.append(col_11_0);
-  row2.append(col_11_1);
-
-  var cardBody = $("<div/>").addClass("card-body");
-  cardBody.append(row2);
-
-  var headerH4 = $("<h4/>").addClass("m-0 font-weight-bold text-primary").append("<span/>").text("Doctor Profile");
-  var cardheader = $("<div/>").addClass("card-header py-3");
-  cardheader.append(headerH4);
-
-
-  var cardShadow = $("<div/>").addClass(" shadow mb-4");
-  cardShadow.append(cardheader);
-  cardShadow.append(cardBody);
-
-  var card = $("<div/>").addClass("col-lg-12 mb-12");
-  card.append(cardShadow);
-
-  $("#contentFirstRow").html("");
-  $("#contentFirstRow").append(card);
-}
-function buildDocPatRow(dsabled) {
-  var option0 = $("<option />").text("option 0 ");
-  var option1 = $("<option />").text("option 1 ");
-  var option2 = $("<option />").text("option 2 ");
-  var option3 = $("<option />").text("option 3 ");
-  var option4 = $("<option />").text("option 4 ");
-
-  if (dsabled)
-    var select = $("<select />").attr('disabled', 'true').addClass("form-control col-sm-3 ");
-  else
-    var select = $("<select />").addClass("form-control col-sm-3 ");
-
-  select.append(option4);
-  select.append(option3);
-  select.append(option2);
-  select.append(option1);
-  select.append(option0);
-
-  var lable0 = $("<label>").addClass("col-sm-3 col-form-label").text("Select parties");
-  var lable1 = $("<label>").addClass("col-sm-3 col-form-label").text("With");
-
-  var docs_pat_row = $("<div/>").addClass("row");
-  docs_pat_row.append(lable0);
-  docs_pat_row.append(select);
-  docs_pat_row.append(lable1);
-  docs_pat_row.append(select.clone());
-
-  return docs_pat_row;
-}
-function buildSelectDateRow(dsabled) {
-  if (dsabled) {
-    var select0 = $("<select />").attr('disabled', 'true').addClass("form-control col-sm-3 ");
-    var select1 = $("<select />").attr('disabled', 'true').addClass("form-control col-sm-3 ");
-    var select2 = $("<select />").attr('disabled', 'true').addClass("form-control col-sm-3 ");
-  }
-  else {
-    var select0 = $("<select />").addClass("form-control col-sm-3 ");
-    var select1 = $("<select />").addClass("form-control col-sm-3 ");
-    var select2 = $("<select />").addClass("form-control col-sm-3 ");
-  }
-
-  for (var i = 0; i < 11; i++) {
-    var option = $("<option />").text(months[i]);
-    select0.append(option);
-  }
-
-  for (var i = 0; i < 31; i++) {
-    var option = $("<option />").text(i + 1);
-    select1.append(option);
-  }
-
-  for (var i = 0; i < 24; i++) {
-    var option0 = $("<option />").text(i + ":00");
-    var option1 = $("<option />").text(i + ":30");
-    select2.append(option0);
-    select2.append(option1);
-  }
-
-  var lable0 = $("<label>").addClass("col-sm-3 col-form-label").text("Date");
-
-  var docs_pat_row = $("<div/>").addClass("row");
-  docs_pat_row.append(lable0);
-  docs_pat_row.append(select0);
-  docs_pat_row.append(select1);
-  docs_pat_row.append(select2);
-
-  return docs_pat_row;
-}
 function buildGenericSearch(classs) {
   return '<div class="input-group"><input type="text" class=" ' + classs + ' form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2"><div class="input-group-append"><button class="btn btn-primary" type="button><i class="fas fa-search fa-sm"></i></button></div></div>';
 }
@@ -1280,9 +1135,7 @@ function loadClinicData(callback) {
   }
 }
 //------------------------------------------------------------------------ appointment related functions 
-
-function buildEditAppointmentCard(appointment,patients, doctors) {
-
+function buildEditAppointmentCard(appointment, patients, doctors) {
   var row = $("<div/>").addClass("row");
   var col10 = $("<div/>").addClass("col-md-6");
   var col2 = $("<div/>").addClass("col-md-6");
@@ -1300,14 +1153,14 @@ function buildEditAppointmentCard(appointment,patients, doctors) {
   var cardBody = $("<div/>").addClass("card-body");
   var br = $("<br/>");
 
-  var m = dropDwons('m',"editAppInp");
-  var y = dropDwons('y',"editAppInp");
-  var d = dropDwons('d',"editAppInp");
-  var h = dropDwons('h',"editAppInp");
-  var mn = dropDwons('mn',"editAppInp");
+  var m = dropDwons('m', "editAppInp");
+  var y = dropDwons('y', "editAppInp");
+  var d = dropDwons('d', "editAppInp");
+  var h = dropDwons('h', "editAppInp");
+  var mn = dropDwons('mn', "editAppInp");
 
   cardBody.append(br);
-  cardBody.append(buildDoctorAndPatientOption(patients, doctors,"editAppInp"));
+  cardBody.append(buildDoctorAndPatientOption(patients, doctors, "editAppInp"));
   cardBody.append(br.clone());
   cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n26') + '</label>' + d + '' + m + '' + y + '</div>');
   cardBody.append(br.clone());
@@ -1321,13 +1174,24 @@ function buildEditAppointmentCard(appointment,patients, doctors) {
   var cardShadow = $("<div/>").addClass("card shadow ");
   cardShadow.append(cardheader);
   cardShadow.append(cardBody);
-  var card = $("<div/>").addClass("col-lg-6 mb-6 mb-4");
+  var card = $("<div/>").addClass("col-lg-12 mb-12 ");
   card.append(cardShadow);
+
+  var modal = $("<div/>").addClass("modal fade").attr('id', 'editAppointmentModal');
+  var modalDialog = $("<div/>").addClass("modal-dialog modal-lg");
+  var modalCon = $("<div/>").addClass("modal-content");
+  var modalBody = $("<div/>").addClass("modal-body");
+  modalBody.append(card);
+  modalCon.append(modalBody);
+  modalDialog.append(modalCon);
+  modal.append(modalDialog);
+
   $("#appendTopBox").html("");
-  $("#appendTopBox").append(card);
+  $("#appendTopBox").append(modal);
   setFlds(appointment);
+  $("#editAppointmentModal").modal("show");
 }
-function buildAddAppointmentCard(patients, doctors) {
+function buildAddAppointmentCard(patients, doctors, isModal) {
 
   var row = $("<div/>").addClass("row");
   var col10 = $("<div/>").addClass("col-md-6");
@@ -1346,18 +1210,18 @@ function buildAddAppointmentCard(patients, doctors) {
   var cardBody = $("<div/>").addClass("card-body");
   var br = $("<br/>");
 
-  var m = dropDwons('m',"addNewAppInp");
-  var y = dropDwons('y',"addNewAppInp");
-  var d = dropDwons('d',"addNewAppInp");
-  var h = dropDwons('h',"addNewAppInp");
-  var mn = dropDwons('mn',"addNewAppInp");
+  var m = dropDwons('m', "addNewAppInp");
+  var y = dropDwons('y', "addNewAppInp");
+  var d = dropDwons('d', "addNewAppInp");
+  var h = dropDwons('h', "addNewAppInp");
+  var mn = dropDwons('mn', "addNewAppInp");
 
   cardBody.append(br);
-  cardBody.append(buildDoctorAndPatientOption(patients, doctors,"addNewAppInp"));
+  cardBody.append(buildDoctorAndPatientOption(patients, doctors, "addNewAppInp"));
   cardBody.append(br.clone());
   cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n26') + '</label>' + d + '' + m + '' + y + '</div>');
   cardBody.append(br.clone());
-  cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n28') + '</label>' + h + '<label class="col-sm-1 col-form-label">Hour</label>' + mn + '<label class="col-sm-2 col-form-label">Minutes</label></div>');
+  cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n28') + '</label>' + h + '<label class="col-sm-2 col-form-label">Hour</label>' + mn + '<label class="col-sm-2 col-form-label">Minutes</label></div>');
   cardBody.append(br.clone());
   cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n20') + '</label><select  name="specialty" class="addNewAppInp form-control col-sm-3">' + specOptions() + '</select</div>');
   cardBody.append(br.clone());
@@ -1365,13 +1229,31 @@ function buildAddAppointmentCard(patients, doctors) {
   cardBody.append(br.clone());
   cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n16') + '</label><button class="addNewAppBtn btn btn-success">' + lns.getText('n58') + '</button></div>');
 
-
   var cardShadow = $("<div/>").addClass("card shadow ");
   cardShadow.append(cardheader);
   cardShadow.append(cardBody);
-  var card = $("<div/>").addClass("col-lg-6 mb-6 mb-4");
-  card.append(cardShadow);
-  return card;
+
+
+
+  if (isModal) {
+    var card = $("<div/>").addClass("col-lg-12 mb-12 ");
+    card.append(cardShadow);
+    var modal = $("<div/>").addClass("modal fade").attr('id', 'appointmentModal');
+    var modalDialog = $("<div/>").addClass("modal-dialog modal-lg");
+    var modalCon = $("<div/>").addClass("modal-content");
+    var modalBody = $("<div/>").addClass("modal-body");
+    modalBody.append(card);
+    modalCon.append(modalBody);
+    modalDialog.append(modalCon);
+    modal.append(modalDialog);
+    return modal;
+
+  }
+  else {
+    var card = $("<div/>").addClass("col-lg-6 mb-6 mb-4");
+    card.append(cardShadow);
+    return card;
+  }
 }
 function buildAppointmentCard(appointment) {
   if (!appointment)
@@ -1417,7 +1299,7 @@ function buildAppointmentCard(appointment) {
   cardBody.append(br.clone());
   cardBody.append('<div class="row"><label class="col-sm-2 col-form-label"></label><textarea  name="comment" class="addNewAppInp form-control col-sm-8"></textarea><button class=" btn btn-success">' + lns.getText('n58') + '</button></div>');
   cardBody.append(br.clone());
-  cardBody.append('<div class="row"><label class="col-sm-2 col-form-label"></label><button aid="'+appointment.id+'" class="edtAppointmentShow btn btn-warning">' + lns.getText('n30') + '</button></div>');
+  cardBody.append('<div class="row"><label class="col-sm-2 col-form-label"></label><button aid="' + appointment.id + '" class="edtAppointmentShow btn btn-warning">' + lns.getText('n30') + '</button></div>');
 
   var cardShadow = $("<div/>").addClass(" shadow mb-4");
   cardShadow.append(cardheader);
@@ -1427,33 +1309,33 @@ function buildAppointmentCard(appointment) {
   card.append(cardShadow);
   return card;
 }
-function dropDwons(menue,inp) {
+function dropDwons(menue, inp) {
 
-  var m = '<select name="month" class="'+inp+' form-control col-sm-2">';
+  var m = '<select name="month" class="' + inp + ' form-control col-sm-4">';
   for (var i = 0; i < 12; i++) {
     m += '<option value="' + (i + 1) + '">' + months[i + 1] + '</option>';
   }
   m += '</select>';
 
-  var y = '<select name="year" class="'+inp+' form-control col-sm-2">';
+  var y = '<select name="year" class="' + inp + ' form-control col-sm-4">';
   for (var i = 2019; i < 2025; i++) {
     y += '<option value="' + i + '">' + i + '</option>';
   }
   y += '</select>';
 
-  var d = '<select name="day" class="'+inp+' form-control col-sm-2">';
+  var d = '<select name="day" class="' + inp + ' form-control col-sm-2">';
   for (var i = 0; i < 31; i++) {
     d += '<option value="' + (i + 1) + '">' + (i + 1) + '</option>';
   }
   d += '</select>';
 
-  var h = '<select name="hour" class="'+inp+' form-control col-sm-2">';
+  var h = '<select name="hour" class="' + inp + ' form-control col-sm-2">';
   for (var i = 0; i < 24; i++) {
     h += '<option value="' + i + '">' + i + '</option>';
   }
   h += '</select>';
 
-  var mn = '<select name="minutes" class="'+inp+' form-control col-sm-2">';
+  var mn = '<select name="minutes" class="' + inp + ' form-control col-sm-2">';
   for (var i = 0; i < 60; i += 10) {
     mn += '<option value="' + i + '">' + i + '</option>';
   }
@@ -1470,19 +1352,19 @@ function dropDwons(menue,inp) {
   else if (menue == "mn")
     return mn;
 }
-function buildDoctorAndPatientOption(patients, doctors,inp) {
-  var res = '<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n39') + '</label><select name="doctor" class="'+inp+' form-control col-sm-4" >';
+function buildDoctorAndPatientOption(patients, doctors, inp) {
+  var res = '<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n39') + '</label><select name="doctor" class="' + inp + ' form-control col-sm-4" >';
   for (var a in doctors) {
     res += '<option value="' + doctors[a].id + '">' + doctors[a].fname + ',' + doctors[a].lname + '</option>';
   }
-  res += '</select><label class="col-sm-2 col-form-label">' + lns.getText('n40') + '</label><select name="patient" class="'+inp+' form-control col-sm-4">';
+  res += '</select><label class="col-sm-2 col-form-label">' + lns.getText('n40') + '</label><select name="patient" class="' + inp + ' form-control col-sm-4">';
   for (var a in patients) {
     res += '<option value="' + patients[a].id + '">' + patients[a].fname + ',' + patients[a].lname + '</option>';
   }
   res += '</select>';
   return res;
 }
-function setFlds(appointment){
+function setFlds(appointment) {
   var tempDate = appointment.date.split("T");
   var time = tempDate[1].split(':');
   tempDate = tempDate[0].split('-');
@@ -1841,125 +1723,60 @@ function buildUsersListBody(clinicUsers) {
 
 
 
+mysql://b692e07e1f51a6:c296d0a8@eu-cdbr-west-02.cleardb.net/heroku_faf329674943f73?reconnect=true
 
 
 
 
 
 
+function buildEditAppointmentCard2(appointment, patients, doctors) {
 
+  var row = $("<div/>").addClass("row");
+  var col10 = $("<div/>").addClass("col-md-6");
+  var col2 = $("<div/>").addClass("col-md-6");
 
+  var headerH4 = $("<h4/>").addClass("m-0 font-weight-bold text-primary").append("<span/>").text(lns.getText('n25'));
+  var minimize = $("<i/>").addClass("minimizeBtn  dropShadHov float-right fa fa-compress-arrows-alt");
+  col10.append(headerH4);
+  col2.append(minimize);
 
+  var cardheader = $("<div/>").addClass(" card-header py-3");
+  row.append(col10);
+  row.append(col2);
+  cardheader.append(row);
 
-
-
-//unused
-function addAppointmentModal() {
-
-  var btn = $("<button/>").addClass("close").attr("type", "button").attr("data-dismiss", "modal").text("X");
-  var heading = $("<h4/>").addClass("modal-title").text("Add New Appointment").text("Add New Appointment");
-
-  var modalHeader = $("<div/>").addClass("modal-header");
-  modalHeader.append(heading);
-  modalHeader.append(btn);
-
-  var modalBody = $("<div/>").addClass("modal-body");
-  modalBody.append(buildDocPatRow(false));
-  modalBody.append(buildSelectDateRow(false));
-
-  var modalFooter = $("<div/>").addClass("modal-footer");
-  var btn1 = $("<button/>").addClass("btn btn-primary").attr('data-dismiss', 'modal').text(lns.getText('n16'));
-  modalFooter.append(btn1);
-
-  var modalCont = $("<div/>").addClass("modal-content");
-  modalCont.append(modalHeader);
-  modalCont.append(modalBody);
-  modalCont.append(modalFooter);
-
-  var modalDial = $("<div/>").addClass("modal-dialog");
-  modalDial.append(modalCont);
-
-  var modal = $("<div/>").addClass("modal fade").attr("id", "addAppointmentModal").attr("role", "dialog");
-  modal.append(modalDial);
-  $("#contentSecondRow").append(modal);
-}
-function addDoctorModal() {
-
-  var btn = $("<button/>").addClass("close").attr("type", "button").attr("data-dismiss", "modal").text("X");
-  var heading = $("<h4/>").addClass("modal-title").text("Add New Appointment").text("Add New Doctor");
-
-  var modalHeader = $("<div/>").addClass("modal-header");
-  modalHeader.append(heading);
-  modalHeader.append(btn);
-
-
-  var modalBody = $("<div/>").addClass("modal-body");
-  modalBody.append('<div class="row"><label class="col-sm-3 col-form-label">First Name</label><input class="form-control col-sm-3"><label class="col-sm-3 col-form-label">Last Name</label><input class="form-control col-sm-3"></div>');
-  modalBody.append('<div class="row"><label class="col-sm-3 col-form-label">Address</label><input class="form-control col-sm-3"><label class="col-sm-3 col-form-label">Speciality</label><input class="form-control col-sm-3"></div>');
-  modalBody.append('<div class="row"><label class="col-sm-3 col-form-label">Nationality</label><input class="form-control col-sm-3"></div>');
-  //modalBody.append();
-
-  var modalFooter = $("<div/>").addClass("modal-footer");
-  var btn1 = $("<button/>").addClass("btn btn-primary").attr('data-dismiss', 'modal').text(lns.getText('n16'));
-  modalFooter.append(btn1);
-
-  var modalCont = $("<div/>").addClass("modal-content");
-  modalCont.append(modalHeader);
-  modalCont.append(modalBody);
-  modalCont.append(modalFooter);
-
-  var modalDial = $("<div/>").addClass("modal-dialog");
-  modalDial.append(modalCont);
-
-  var modal = $("<div/>").addClass("modal fade").attr("id", "addDoctorModal").attr("role", "dialog");
-  modal.append(modalDial);
-  $("#contentSecondRow").append(modal);
-}
-function addEditableAppointmentModal(appIndex) {
-
-  var btn = $("<button/>").addClass("close").attr("type", "button").attr("data-dismiss", "modal").text("X");
-  var heading = $("<h4/>").addClass("modal-title").text("Add New Appointment").text("Add New Appointment");
-
-  var modalHeader = $("<div/>").addClass("modal-header");
-  modalHeader.append(heading);
-  modalHeader.append(btn);
-
-
-  var modalBody = $("<div/>").addClass("modal-body");
-  modalBody.append(buildDocPatRow(true));
-  modalBody.append(buildSelectDateRow(true));
-
-
-  var modalFooter = $("<div/>").addClass("modal-footer");
-  var btn1 = $("<button/>").addClass("btn btn-warning").attr('data-dismiss', 'modal').text("Edit");
-  modalFooter.append(btn1);
-
-  var modalCont = $("<div/>").addClass("modal-content");
-  modalCont.append(modalHeader);
-  modalCont.append(modalBody);
-  modalCont.append(modalFooter);
-
-  var modalDial = $("<div/>").addClass("modal-dialog");
-  modalDial.append(modalCont);
-
-  var modal = $("<div/>").addClass("modal fade").attr("id", "addAppointmentModal").attr("role", "dialog");
-  modal.append(modalDial);
-  $("#contentSecondRow").html("");
-  $("#contentSecondRow").html(modal);
-}
-function buildAddDoctorCard() {
-  var heading = $("<h3/>").text("Add Doctor +");
-  var row = $("<div/>").addClass("row no-gutters align-items-center");
-  row.append(heading);
   var cardBody = $("<div/>").addClass("card-body");
-  cardBody.append(row);
+  var br = $("<br/>");
 
-  var cardShadow = $("<div/>").addClass("card border-left-warning shadow h-100 py-2");
+  var m = dropDwons('m', "editAppInp");
+  var y = dropDwons('y', "editAppInp");
+  var d = dropDwons('d', "editAppInp");
+  var h = dropDwons('h', "editAppInp");
+  var mn = dropDwons('mn', "editAppInp");
 
+  cardBody.append(br);
+  cardBody.append(buildDoctorAndPatientOption(patients, doctors, "editAppInp"));
+  cardBody.append(br.clone());
+  cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n26') + '</label>' + d + '' + m + '' + y + '</div>');
+  cardBody.append(br.clone());
+  cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n28') + '</label>' + h + '<label class="col-sm-1 col-form-label">Hour</label>' + mn + '<label class="col-sm-2 col-form-label">Minutes</label></div>');
+  cardBody.append(br.clone());
+  cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n20') + '</label><select  name="specialty" class="editAppInp form-control col-sm-3">' + specOptions() + '</select</div>');
+  cardBody.append(br.clone());
+  cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n16') + '</label><button  class="editAppInpBtn btn btn-success">' + lns.getText('n31') + '</button></div>');
+
+
+  var cardShadow = $("<div/>").addClass("card shadow ");
+  cardShadow.append(cardheader);
   cardShadow.append(cardBody);
-
-  var card = $("<div/>").addClass("clickable toggleAddDoctorModal col-xl-2 col-md-2 mb-4");
+  var card = $("<div/>").addClass("col-lg-6 mb-6 mb-4");
   card.append(cardShadow);
-
-  return card;
+  $("#appendTopBox").html("");
+  $("#appendTopBox").append(card);
+  setFlds(appointment);
 }
+
+
+
+

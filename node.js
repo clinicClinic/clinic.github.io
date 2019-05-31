@@ -300,6 +300,7 @@ function getAppointments(user,callback){
   var sql = 'SELECT * FROM appointments_3sd3df WHERE clinic_id = ?';
   pool.query(sql,[user.clinic_id], function(error, results){
     if (error) throw error;
+    console.log(results);
     callback(results);
   });
 }
