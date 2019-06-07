@@ -374,6 +374,9 @@ $(document).ready(function () {
       });
     });
   });
+  $(document).on("click", ".setSecTimeBtn", function () {
+    setTimeSec();
+  });
 
 
 
@@ -1408,12 +1411,14 @@ function timeSec() {
   }
   res += '<div class="row border-left border-top border-bottom">';
   res += '<br>';
-  res += '<button  class="btn btn-success">'+lns.getText("n68");+' </button>';
+  res += '<button  class="btn btn-success setSecTimeBtn">'+lns.getText("n68");+' </button>';
   res += '</div>';
   return res;
 }
 function setTimeSec(){
-  $('.timeNode[slctd="true"]').each(function(){});
+  $('.timeNode[slctd="true"]').each(function(){
+    //console.log($(this).attr("timeSec"));
+  });
     
 }
 //------------------------------------------------------------------------ appointment related functions 
