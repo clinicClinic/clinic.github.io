@@ -68,6 +68,15 @@ var selectedLang = {
     n58: "Add",
     n59: "Select",
     n60: "No selection",
+    n61: "User Profile",
+    n62: "User Information",
+    n63: "Status",
+    n64: "Scheduled",
+    n65: "Attended",
+    n66: "Finished",
+    n67: "More",
+    n68: "Update available schedule"
+
   },
   ar: {
     n0: "عيادة" ,
@@ -130,7 +139,15 @@ var selectedLang = {
     n57: "التالي" , 
     n58: "أضف",
     n59: "أختر",
-    n60: "لا اختيار" 
+    n60: "لا اختيار" ,
+    n61: "ملف تعريف المستخدم" ,
+    n62: "معلومات المستخدم" ,
+    n63: "الحالة" , 
+    n64: "مجدول" , 
+    n65: "حضر" , 
+    n66: "انتهى" ,
+    n67: "المزيد",
+    n68: "تحديث الجدول الزمني المتاح"
 
 }
 };

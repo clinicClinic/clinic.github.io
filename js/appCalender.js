@@ -15,86 +15,96 @@ import * as obj from './obj.js';
 //listeners 
 $(document).on("click", ".calNext", function () {
   var acid = $(this).attr("acId");
-  if(acid=="month"){
+  if (acid == "month") {
     day = monthDays;
     changeDay("inc");
   }
-  else if(acid=="week"){
+  else if (acid == "week") {
     changeWeekCal("nxt");
   }
-  else{
+  else {
     changeDay("inc");
   }
 
-  calTran(acid);
-  renderApp(acid);
+  calTran();
+  renderApp();
 
 });
 $(document).on("click", ".calPrev", function () {
   var acid = $(this).attr("acId");
-  if(acid=="month"){
+  if (acid == "month") {
     day = 1;
     changeDay("dec");
     day = 1;
   }
-  else if(acid=="week"){
+  else if (acid == "week") {
     changeWeekCal("prev");
   }
-  else{
+  else {
     changeDay("dec");
   }
 
-  calTran(acid);
-  renderApp(acid);
-  
+  calTran();
+  renderApp();
+
 });
 
 
 $(document).on("click", ".weeksBtn", function () {
   //update the week header dates
   buildWeeksCalHelper();
-  $(".slcted").attr("cid","week");
-  $(".calNext").attr("acid","week");
-  $(".calPrev").attr("acid","week");
-  calTran("week");
+  $(".slcted").attr("cid", "week");
+  $(".calNext").attr("acid", "week");
+  $(".calPrev").attr("acid", "week");
+
+  localStorage.setItem("slctdCalView", "week");
+
+  calTran();
 });
 $(document).on("click", ".monthsBtn", function () {
-  $(".slcted").attr("cid","month");
-  $(".calNext").attr("acid","month");
-  $(".calPrev").attr("acid","month");
+  $(".slcted").attr("cid", "month");
+  $(".calNext").attr("acid", "month");
+  $(".calPrev").attr("acid", "month");
+
+  localStorage.setItem("slctdCalView", "month");
+
   day = 1;
   var tmpDate = new Date(year, month);
   dayOffset = tmpDate.getDay();
-  $(".slcted").attr("cid","month");
+  $(".slcted").attr("cid", "month");
   calTran("month");
 });
 $(document).on("click", ".dayBtn", function () {
-  $(".slcted").attr("cid","day");
-  $(".calNext").attr("acid","day");
-  $(".calPrev").attr("acid","day");
-  calTran("day");
-  renderApp("day");
+  $(".slcted").attr("cid", "day");
+  $(".calNext").attr("acid", "day");
+  $(".calPrev").attr("acid", "day");
+
+  localStorage.setItem("slctdCalView", "day");
+
+  calTran();
+  renderApp();
 });
-
-
-
 $(document).on("change", ".slcted", function (event) {
   var cid = $(this).attr("cid");
-  renderApp(cid);
+  renderApp();
 
 });
 $(document).on("click", ".isMonthDayCell", function (event) {
   var date = $(this).attr('day-cell')
   var date = date.split("-");
   day = date[2];
-  $(".slcted").attr("cid","day");
-  $(".calNext").attr("acid","day");
-  $(".calPrev").attr("acid","day");
-  calTran("day");
-  renderApp("day");
+
+  localStorage.setItem("slctdCalView", "day");
+
+  $(".slcted").attr("cid", "day");
+  $(".calNext").attr("acid", "day");
+  $(".calPrev").attr("acid", "day");
+  calTran();
+  renderApp();
 });
 export function rend() {
   appointmentCont();
+  calTran();
 }
 
 // ------------------------------------------------------------------------------------------ monthly calendar functions------------------------------------------------------------------------------------------
@@ -105,9 +115,9 @@ function appointmentCont() {
   var weekBtn = $("<a/>").addClass("weeksBtn btn-sm animated-button thar-one").text(lns.getText('n53'));
   var monthBtn = $("<a/>").addClass("monthsBtn btn-sm animated-button thar-one").text(lns.getText('n54'));
   var dayBtn = $("<a/>").addClass("dayBtn btn-sm animated-button thar-one").text(lns.getText('n55'));
-  var title = $("<h3/>").attr("id","calnderDate").addClass("m-0 font-weight-bold mdl-color-text--blue-A200 ").text(year + ',' + months[month]);
-  var prevBtn = $("<a/>").attr("acid","month").addClass("calPrev btn-sm animated-button thar-four").text(lns.getText('n56'));
-  var nextBtn = $("<a/>").attr("acid","month").addClass("calNext btn-sm animated-button thar-three").text(lns.getText('n57'));
+  var title = $("<h3/>").attr("id", "calnderDate").addClass("m-0 font-weight-bold mdl-color-text--blue-A200 ").text(year + ',' + months[month]);
+  var prevBtn = $("<a/>").attr("acid", "month").addClass("calPrev btn-sm animated-button thar-four").text(lns.getText('n56'));
+  var nextBtn = $("<a/>").attr("acid", "month").addClass("calNext btn-sm animated-button thar-three").text(lns.getText('n57'));
 
   var colEmpty = $("<div/>").addClass("col-md-1");
   var dayBtnCol = $("<div/>").addClass("col-md-1");
@@ -139,10 +149,10 @@ function appointmentCont() {
   cardBody.append(br.clone());
   cardBody.append(calHeaderRow);
   cardBody.append(br);
-  cardBody.append(buildMonthlycalendar());
+  cardBody.append("<div class='calendar' ></div>");
 
   var headerH4 = $("<h4/>").addClass("m-0 font-weight-bold text-primary").append("<span/>").text(lns.getText('n42'));
-  var addAppointmentBtn = $("<button/>").addClass("toggleAppointmentCard dropShadHov mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored").text("+");
+  var addAppointmentBtn = $("<button/>").addClass("toggleAppointmentCard dropShadHov mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored").attr('app-data', '{"month":"' + month + '"}').text("+");
   var headerCol0 = $("<div/>").addClass("col-auto");
   var headerCol1 = $("<div/>").addClass("col-auto");
   var headerRow = $("<div/>").addClass("row");
@@ -156,7 +166,7 @@ function appointmentCont() {
 
   var cardShadow = $("<div/>").addClass(" shadow mb-4");
   cardShadow.append(cardheader);
-  
+
   cardShadow.append(cardBody);
 
   var card = $("<div/>").addClass("col-lg-12 mb-12");
@@ -164,7 +174,7 @@ function appointmentCont() {
 
   $("#contentFirstRow").html("");
   $("#contentFirstRow").append(card);
-  renderMonthAppointments('','');
+  renderMonthAppointments('', '');
 
 }
 function buildMonthlycalendar() {
@@ -174,7 +184,7 @@ function buildMonthlycalendar() {
     calendarHeader.append($("<div/>").text(daysArray[i]));
   }
   var calCells = buildcalendarCells();
-  var calendar = $("<div/>").addClass("calendar");
+  var calendar = $("<div/>").addClass("");
   calendar.append(calendarHeader);
   calendar.append(calCells);
 
@@ -219,10 +229,10 @@ function buildDaylycalendar() {
   for (var i = 0; i < 24; i++) {
     if (i == 12)
       am = "pm";
-    v += '<div class="dayly_calendar_box  day">' + ((i % 12) + 1) + ':00 ' + am + '</div>';
-    v += '<div appointmentcount="0" day-hour-cell="' + year + '-' + month + '-' + day + '-' + (i + 1) + ':00" class="clickable toggleAppointmentCard isCalWeekCell dayly_calendar_box calendar_hov day"></div>';
-    v += '<div class="dayly_calendar_box  day">--</div>';
-    v += '<div appointmentcount="0" day-hour-cell="' + year + '-' + month + '-' + day + '-' + (i + 1) + ':30" class="clickable toggleAppointmentCard isCalWeekCell dayly_calendar_box calendar_hov day"></div>'
+    v += "<div class='dayly_calendar_box  day'>" + ((i % 12)) + ":00 " + am + "</div>";
+    v += "<div appointmentcount='0' day-hour-cell='" + year + "-" + month + "-" + day + "-" + (i + 1) + ":00' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + i + '","minutes":"0"}' + "'   class='clickable toggleAppointmentCard isCalWeekCell dayly_calendar_box calendar_hov day'></div>";
+    v += "<div class='dayly_calendar_box  day'>--</div>";
+    v += "<div appointmentcount='0' day-hour-cell='" + year + "-" + month + "-" + day + "-" + (i + 1) + ":30' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + i + '","minutes":"30"}' + "'   class='clickable toggleAppointmentCard isCalWeekCell dayly_calendar_box calendar_hov day'></div>"
   }
 
   var calendarHeader = $("<div/>").addClass("dayly_calendar_header");
@@ -249,7 +259,7 @@ function buildWeekscalendar(s, e, am) {
     <div day-head-date="'+ weekDaysDates[5] + '">Fri(' + weekDaysDates[5] + ')</div>\
     <div day-head-date="'+ weekDaysDates[6] + '">Sat(' + weekDaysDates[6] + ')</div>\
   </div>\
-  <div class="weekly_calendar_body">'+ v ;
+  <div class="weekly_calendar_body">'+ v;
   calendar.append(w);
   return calendar;
 }
@@ -260,24 +270,14 @@ function buildDayHours(s, e, am) {
   for (var i = s; i < e; i++) {
     if ((i % 12) == 0)
       am = (am + 1) % 2;
-    v += '\
-    <div class="weekly_calendar_box calendar_hov day">'+ (i % 12) + ':00 ' + timePeroid[am] + '</div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[0] + '-' + i + ':00" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[1] + '-' + i + ':00" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[2] + '-' + i + ':00" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[3] + '-' + i + ':00" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[4] + '-' + i + ':00" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[5] + '-' + i + ':00" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[6] + '-' + i + ':00" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>\
-    <div  class="weekly_calendar_box calendar_hov day">--</div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[0] + '-' + i + ':30" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[1] + '-' + i + ':30" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[2] + '-' + i + ':30" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[3] + '-' + i + ':30" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[4] + '-' + i + ':30" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[5] + '-' + i + ':30" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>\
-    <div appointmentCount="0" day-hour-cell="'+ weekDaysDates[6] + '-' + i + ':30" class="toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day"></div>';
-
+    v += "<div class='weekly_calendar_box calendar_hov day'>" + (i % 12) + ":00 " + timePeroid[am] + "</div>";
+    for (var k = 0; k < 7; k++) {
+      v += "<div appointmentCount='0' day-hour-cell='" + weekDaysDates[k] + "-" + i + ":00' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + (i + 1) + '","minutes":"0"}' + "'  class='toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day'></div>";
+    }
+    v += "<div  class='weekly_calendar_box calendar_hov day'>--</div>";
+    for (var j = 0; j < 7; j++) {
+      v += "<div appointmentCount='0' day-hour-cell='" + weekDaysDates[k] + "-" + i + ":30' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + (i + 1) + '","minutes":"30"}' + "'  class='toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day'></div>";
+    }
   }
   return v;
 }
@@ -292,7 +292,7 @@ function buildWeeksCalHelper() {
   //calculate the start of the week
   for (var i = 0; i < 7; i++) {
     changeDay("inc");
-    weekDaysDates[i] = year + "-" + month  + "-" + day;
+    weekDaysDates[i] = year + "-" + month + "-" + day;
   }
 
 
@@ -337,7 +337,7 @@ function changeWeekCal(chng) {
     //calculate the start of the week
     for (var i = 0; i < 7; i++) {
       changeDay("inc");
-      weekDaysDates[i] = year + "-" + month  + "-" + day;
+      weekDaysDates[i] = year + "-" + month + "-" + day;
     }
   }
   else {
@@ -348,7 +348,7 @@ function changeWeekCal(chng) {
     //calculate the start of the week
     for (var i = 0; i < 7; i++) {
       changeDay("inc");
-      weekDaysDates[i] = year + "-" + month  + "-" + day;
+      weekDaysDates[i] = year + "-" + month + "-" + day;
     }
   }
   console.log("weekDaysDates");
@@ -360,20 +360,20 @@ function daysInThisMonth(year, month) {
 }
 //----------------------------------------------------------------- rendering appointment in the calender
 //rendering the appointments
-function renderWeeksAppointments(specialty,did) {
+function renderWeeksAppointments(specialty, did) {
   var a;
   var appointments = localStorage.getItem("appointments");
   appointments = JSON.parse(appointments);
   for (a in appointments) {
-    if(specialty!='' && did!=''){
-      if(appointments[a].specialty!=specialty) continue;
-      if(appointments[a].doctor_id!=did) continue;
+    if (specialty != '' && did != '') {
+      if (appointments[a].specialty != specialty) continue;
+      if (appointments[a].doctor_id != did) continue;
     }
-    else if(specialty!='' && did==''){
-      if(appointments[a].specialty!=specialty) continue;
+    else if (specialty != '' && did == '') {
+      if (appointments[a].specialty != specialty) continue;
     }
-    else if(specialty=='' && did!=''){
-      if(appointments[a].doctor_id!=did) continue;
+    else if (specialty == '' && did != '') {
+      if (appointments[a].doctor_id != did) continue;
     }
 
     var appointment = obj.getAppointment(appointments[a].id);
@@ -382,7 +382,7 @@ function renderWeeksAppointments(specialty,did) {
     var elmnt = $('.isCalWeekCell[day-hour-cell="' + adjDate + '"]');
     var count = elmnt.attr("appointmentCount");
     if (count < 2) {
-      var appBox = '<div  appointmentId="'+appointment.id+'" class="appCardClick appointment-week-boxs"><div>Specialty :' + appointment.specialty +'</div></div>';
+      var appBox = '<div  appointmentId="' + appointment.id + '" class="appCardClick appointment-week-boxs"><div>Specialty :' + appointment.specialty + '</div></div>';
       elmnt.append(appBox);
     }
     else if (count == 2) {
@@ -394,20 +394,20 @@ function renderWeeksAppointments(specialty,did) {
   }
 }
 //rendering the dayly appointments
-function renderDaysAppointments(specialty,did) {
+function renderDaysAppointments(specialty, did) {
   var a;
   var appointments = localStorage.getItem("appointments");
   appointments = JSON.parse(appointments);
   for (a in appointments) {
-    if(specialty!='' && did!=''){
-      if(appointments[a].specialty!=specialty) continue;
-      if(appointments[a].doctor_id!=did) continue;
+    if (specialty != '' && did != '') {
+      if (appointments[a].specialty != specialty) continue;
+      if (appointments[a].doctor_id != did) continue;
     }
-    else if(specialty!='' && did==''){
-      if(appointments[a].specialty!=specialty) continue;
+    else if (specialty != '' && did == '') {
+      if (appointments[a].specialty != specialty) continue;
     }
-    else if(specialty=='' && did!=''){
-      if(appointments[a].doctor_id!=did) continue;
+    else if (specialty == '' && did != '') {
+      if (appointments[a].doctor_id != did) continue;
     }
     var appointment = obj.getAppointment(appointments[a].id);
     var adjDate = adjustDate(appointment.date);
@@ -415,9 +415,9 @@ function renderDaysAppointments(specialty,did) {
     var elmnt = $('.isCalWeekCell[day-hour-cell="' + adjDate + '"]');
     var count = elmnt.attr("appointmentCount");
     if (count < 5) {
-      var appBox = '<div  appointmentId="'+appointment.id+'" class="px-2 appCardClick appointment-week-boxs"><div>Doctor :' + appointment.doctor.fname+','+appointment.doctor.lname + '</div> \
-                                                                            <div> Patient :' + appointment.patient.fname+','+appointment.patient.lname +'</div>\
-                                                                            <div>Specialty :' + appointment.specialty +'\</div></div>';
+      var appBox = '<div  appointmentId="' + appointment.id + '" class="px-2 appCardClick appointment-week-boxs"><div>Doctor :' + appointment.doctor.fname + ',' + appointment.doctor.lname + '</div> \
+                                                                            <div> Patient :' + appointment.patient.fname + ',' + appointment.patient.lname + '</div>\
+                                                                            <div>Specialty :' + appointment.specialty + '\</div></div>';
       elmnt.append(appBox);
     }
     else if (count == 5) {
@@ -429,81 +429,81 @@ function renderDaysAppointments(specialty,did) {
   }
 }
 //rendering the appointments
-function renderMonthAppointments(specialty,did) {
+function renderMonthAppointments(specialty, did) {
   var appointments = localStorage.getItem('appointments');
   appointments = JSON.parse(appointments);
-  if(!appointments)
+  if (!appointments)
     return;
 
 
-    var a;
-    for (a in appointments) {
-      if(specialty!='' && did!=''){
-        if(appointments[a].specialty!=specialty) continue;
-        if(appointments[a].doctor_id!=did) continue;
-      }
-      else if(specialty!='' && did==''){
-        if(appointments[a].specialty!=specialty) continue;
-      }
-      else if(specialty=='' && did!=''){
-        if(appointments[a].doctor_id!=did) continue;
-      }
-
-     
-      var tempDate = appointments[a].date.split("T");
-      tempDate = tempDate[0].split('-');
-      tempDate = parseInt(tempDate[0]) + '-' + parseInt(tempDate[1]) + '-' + parseInt(tempDate[2]);
-      var elmnt = $('.isMonthDayCell[day-cell="' + tempDate + '"]');
-      var count = elmnt.attr("appointmentCount");
-      count++;
-      elmnt.find('a').show().html(count);
-      elmnt.attr("appointmentCount", count);
+  var a;
+  for (a in appointments) {
+    if (specialty != '' && did != '') {
+      if (appointments[a].specialty != specialty) continue;
+      if (appointments[a].doctor_id != did) continue;
     }
+    else if (specialty != '' && did == '') {
+      if (appointments[a].specialty != specialty) continue;
+    }
+    else if (specialty == '' && did != '') {
+      if (appointments[a].doctor_id != did) continue;
+    }
+
+
+    var tempDate = appointments[a].date.split("T");
+    tempDate = tempDate[0].split('-');
+    tempDate = parseInt(tempDate[0]) + '-' + parseInt(tempDate[1]) + '-' + parseInt(tempDate[2]);
+    var elmnt = $('.isMonthDayCell[day-cell="' + tempDate + '"]');
+    var count = elmnt.attr("appointmentCount");
+    count++;
+    elmnt.find('a').show().html(count);
+    elmnt.attr("appointmentCount", count);
+  }
 
 }
 //rempve appointment
-function rmvApp(cid){
-  if(cid == "month"){
-    $(".isMonthDayCell").each(function(){
-      $(this).attr("appointmentCount",0);
+function rmvApp(cid) {
+  if (cid == "month") {
+    $(".isMonthDayCell").each(function () {
+      $(this).attr("appointmentCount", 0);
       $(this).find('a').hide().html("");
     });
   }
   else {
-    $(".isCalWeekCell").each(function(){
-      $(this).attr("appointmentCount",0);
+    $(".isCalWeekCell").each(function () {
+      $(this).attr("appointmentCount", 0);
       $(this).html("");
     });
   }
 
 }
-function adjustDate(date){
+function adjustDate(date) {
   date = date.split('T');
   var time = date[1];
   var tempDate = date[0].split('-');
-  tempDate = parseInt(tempDate[0]) + '-' + parseInt(tempDate[1]) + '-' + parseInt(tempDate[2]) + '-'; 
+  tempDate = parseInt(tempDate[0]) + '-' + parseInt(tempDate[1]) + '-' + parseInt(tempDate[2]) + '-';
   var tempTime = time.split(':');
-  if(parseInt(tempTime[1])<30){
-    return tempDate+parseInt(tempTime[0])+":00";
+  if (parseInt(tempTime[1]) < 30) {
+    return tempDate + parseInt(tempTime[0]) + ":00";
   }
-  else{
-    return tempDate+parseInt(tempTime[0])+":30";
+  else {
+    return tempDate + parseInt(tempTime[0]) + ":30";
   }
 }
-function selectionHeader(cid){
+function selectionHeader(cid) {
   return '<div class="row shadow border-bottom mdl-color--blue-50	">\
-  <h3 class="col-sm-2 ">'+lns.getText('n59')+'</h3>\
+  <h3 class="col-sm-2 ">'+ lns.getText('n59') + '</h3>\
   <h3 class="col-sm-2 ">' + lns.getText('n20') + '</h3>\
-  <select  cid="'+cid+'" id="slctedSpec" name="Specialty" class="slcted form-control col-sm-2">'+specOptions()+'</select>\
+  <select  cid="'+ cid + '" id="slctedSpec" name="Specialty" class="slcted form-control col-sm-2">' + specOptions() + '</select>\
   <h3 class="col-sm-2 ">' + lns.getText('n39') + '</h3>\
-  <select  cid="'+cid+'" id="slctedDoc" name="doctor" class="slcted form-control col-sm-3" >'+doctorOption()+'</select>\
+  <select  cid="'+ cid + '" id="slctedDoc" name="doctor" class="slcted form-control col-sm-3" >' + doctorOption() + '</select>\
   </div>';
 }
 function doctorOption() {
   var doctors = localStorage.getItem("doctors");
   doctors = JSON.parse(doctors);
-  var res = '<option value="" >'+lns.getText("n60")+'</option>';
-  if(!doctors)
+  var res = '<option value="" >' + lns.getText("n60") + '</option>';
+  if (!doctors)
     return;
   for (var a in doctors) {
     res += '<option value="' + doctors[a].id + '">' + doctors[a].fname + ',' + doctors[a].lname + '</option>';
@@ -511,38 +511,43 @@ function doctorOption() {
   return res;
 }
 function specOptions() {
-  return '<option value="" >'+lns.getText("n60")+'</option><option value="dermatology (skin)">Dermatology (Skin)</option> <option value="dentistry (teeth)">Dentistry (Teeth)</option> <option value="psychiatry">Psychiatry</option> <option value="pediatrics">Pediatrics</option> <option value="neurology">Neurology</option> <option value="orthopedics">Orthopedics</option> <option value="gynecology and infertility">Gynecology and Infertility</option> <option value="ear">Ear</option> <option value="nose and throat">Nose and Throat</option> <option value="cardiology and vascular ">Cardiology and Vascular </option> <option value="allergy">Allergy</option> <option value="androgyny">Androgyny</option> <option value="audiology">Audiology</option> <option value="cardiology">Cardiology</option> <option value="chest and respiratory">Chest and Respiratory</option> <option value="diabetes and rndocrinology">Diabetes and Endocrinology</option> <option value="diagnostic ">Diagnostic </option> <option value="radiology">Radiology</option> <option value="dietitian and nutrition">Dietitian and Nutrition</option> <option value="elders">Elders</option>';
+  return '<option value="" >' + lns.getText("n60") + '</option><option value="dermatology (skin)">Dermatology (Skin)</option> <option value="dentistry (teeth)">Dentistry (Teeth)</option> <option value="psychiatry">Psychiatry</option> <option value="pediatrics">Pediatrics</option> <option value="neurology">Neurology</option> <option value="orthopedics">Orthopedics</option> <option value="gynecology and infertility">Gynecology and Infertility</option> <option value="ear">Ear</option> <option value="nose and throat">Nose and Throat</option> <option value="cardiology and vascular ">Cardiology and Vascular </option> <option value="allergy">Allergy</option> <option value="androgyny">Androgyny</option> <option value="audiology">Audiology</option> <option value="cardiology">Cardiology</option> <option value="chest and respiratory">Chest and Respiratory</option> <option value="diabetes and rndocrinology">Diabetes and Endocrinology</option> <option value="diagnostic ">Diagnostic </option> <option value="radiology">Radiology</option> <option value="dietitian and nutrition">Dietitian and Nutrition</option> <option value="elders">Elders</option>';
 }
-function renderApp(cid){
+function renderApp() {
+  var cid = $(".slcted").attr("cid");
   var did = $("#slctedDoc").val();
   var spec = $("#slctedSpec").val();
 
-  if(cid == "month"){
+  if (cid == "month") {
     rmvApp("month");
-    renderMonthAppointments(spec,did);
+    renderMonthAppointments(spec, did);
   }
-  else if(cid=="week"){
+  else if (cid == "week") {
     rmvApp("week");
-    renderWeeksAppointments(spec,did)
+    renderWeeksAppointments(spec, did)
   }
-  else{
+  else {
     rmvApp("day");
-    renderDaysAppointments(spec,did);
+    renderDaysAppointments(spec, did);
   }
 
 }
-function calTran(trn){
-  $("#calnderDate").text(year+ ',' +months[month]);
-  if(trn=="month"){
+function calTran() {
+  var cid = localStorage.getItem("slctdCalView");
+  if (!cid || cid == "")
+    cid = $(".slcted").attr("cid");
+
+  $("#calnderDate").text(year + ',' + months[month]);
+  if (cid == "month") {
     $(".calendar").html(buildMonthlycalendar());
   }
-  else if(trn=="week"){
-    $(".calendar").html(buildWeekscalendar(0,24,0));
+  else if (cid == "week") {
+    $(".calendar").html(buildWeekscalendar(0, 24, 0));
   }
-  else{
+  else {
     $(".calendar").html(buildDaylycalendar());
   }
-    
 
+  renderApp();
 
 }
