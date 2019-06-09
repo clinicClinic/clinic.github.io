@@ -26,10 +26,10 @@
   <!-- Custom styles for this template-->
   <link href="css/sb-admin-2.min.css" rel="stylesheet">
 
-<script>
-  $( function() {
-    $( "#selectable" ).selectable();
-  } );
+  <script>
+    $(function () {
+      $("#selectable").selectable();
+    });
   </script>
 </head>
 
@@ -182,12 +182,12 @@
           </div>
           <!-- Content Row -->
           <div id="contentFirstRow" class="row">
-            <div class="col-lg-6 mb-4">
-              <div class="card shadow">
+            <div class="col-lg-6 mb-6">
+              <div class="card shadow mb-4">
                 <div class="card-header py-3">
                   <div class="row">
                     <div class="col-md-6">
-                      <h4 class="m-0 font-weight-bold text-primary">المستخدمون</h4>
+                      <h4 class="m-0 font-weight-bold text-primary">Appointments</h4>
                     </div>
                     <div class="col-md-6"><i class="minimizeBtn dropShadHov float-right fa fa-compress-arrows-alt"></i>
                     </div>
@@ -195,67 +195,73 @@
                 </div>
                 <div class="card-body"><br>
                   <div class="input-group"><input type="text"
-                      class=" searchUsersInList form-control bg-light border-0 small" placeholder="Search for..."
+                      class=" searchAppointmentInList form-control bg-light border-0 small" placeholder="Search for..."
                       aria-label="Search" aria-describedby="basic-addon2">
                     <div class="input-group-append"><button class="btn btn-primary" type="button><i class=" fas=""
                         fa-search="" fa-sm"=""></button></div>
                   </div><br><br>
-                  <ol id="selectable">
-                      <li class="ui-widget-content">Item 1</li>
-                      <li class="ui-widget-content">Item 2</li>
-                      <li class="ui-widget-content">Item 3</li>
-                      <li class="ui-widget-content">Item 4</li>
-                      <li class="ui-widget-content">Item 5</li>
-                      <li class="ui-widget-content">Item 6</li>
-                      <li class="ui-widget-content">Item 7</li>
-                    </ol>
-                  <div class="container-fluid no-gutters  ">
-                    <div class="row border border-left border-right border-top border-grey">
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
-                      <div class="col border-right border-grey">1:00</div>
-                      <div class="col border-right border-grey">1:30</div>
+                  <div class="container">
+                    <div class="row border-left border-right border-top border-grey">
+                      <div class="col border-right border-grey">
+                        <h4>Hour</h4>
+                      </div>
+                      <div class="col border-right border-grey">
+                        <h4>Date</h4>
+                      </div>
+                      <div class="col border-right border-grey">
+                        <h4>Patient</h4>
+                      </div>
+                      <div class="col border-right border-grey">
+                        <h4>Doctor</h4>
+                      </div>
+                      <div class="col border-right border-grey">
+                        <h4>Visit</h4>
+                      </div>
+                      <div class="col border-right border-grey"></div>
                     </div>
+                    <div class="row border-left border-right border-top border-grey"
+                      appointment-content="{&quot;id&quot;:121,&quot;doctor_id&quot;:3,&quot;clinic_id&quot;:1,&quot;patient_id&quot;:141,&quot;specialty&quot;:&quot;dentistry&quot;,&quot;comment&quot;:&quot;s&quot;,&quot;date&quot;:&quot;2019-05-07T03:30:00.000Z&quot;,&quot;isBy&quot;:0,&quot;added_by&quot;:3,&quot;stat&quot;:0,&quot;date_added&quot;:&quot;2019-06-03T16:28:25.000Z&quot;}">
+                      <div class="col border-right border-grey text-truncate">
+                        <h4>03:30:00</h4>
+                      </div>
+                      <div class="col border-right border-grey text-truncate">
+                        <h4>2019-05-07</h4>
+                      </div>
+                      <div class="col border-right border-grey text-truncate calendar_hov patCardClick" profileid="141">
+                        <h4>othman,almubarak</h4>
+                      </div>
+                      <div class="col border-right border-grey text-truncate calendar_hov docCardClick" profileid="3">
+                        <h4>ahmed ,mostfa</h4>
+                      </div>
+                      <div class="col border-right border-grey text-truncate">
+                        <h4>dentistry</h4>
+                      </div>
+                      <div class="col calendar_hov appCardClick" appointmentid="121">
+                        <h4>More</h4>
+                      </div>
+                    </div>
+                    <div class="row border-left border-right border-top border-grey"
+                      appointment-content="{&quot;id&quot;:131,&quot;doctor_id&quot;:3,&quot;clinic_id&quot;:1,&quot;patient_id&quot;:1,&quot;specialty&quot;:&quot;dermatology&quot;,&quot;comment&quot;:&quot;c&quot;,&quot;date&quot;:&quot;2019-06-09T02:30:00.000Z&quot;,&quot;isBy&quot;:0,&quot;added_by&quot;:3,&quot;stat&quot;:0,&quot;date_added&quot;:&quot;2019-06-08T00:41:45.000Z&quot;}">
+                      <div class="col-auto border-right border-grey text-truncate">
+                        <h4>02:30:00</h4>
+                      </div>
+                      <div class="col-auto border-right border-grey text-truncate">
+                        <h4>2019-06-09</h4>
+                      </div>
+                      <div class="col-auto border-right border-grey text-truncate calendar_hov patCardClick" profileid="1">
+                        <h4>ahmed,raed</h4>
+                      </div>
+                      <div class="col-auto border-right border-grey text-truncate calendar_hov docCardClick" profileid="3">
+                        <h4>ahmed ,mostfa</h4>
+                      </div>
+                      <div class="col-auto border-right border-grey text-truncate">
+                        <h4>dermatology</h4>
+                      </div>
+                      <div class="col-auto calendar_hov appCardClick" appointmentid="131">
+                        <h4>More</h4>
+                      </div>
+                    </div>
+                    <div class=" row border-top border-grey"></div>
                   </div>
                 </div>
               </div>

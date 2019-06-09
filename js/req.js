@@ -303,3 +303,24 @@ export function integratePatient(data, callback) {
         }
     });
 }
+export function updateDoctor(data,callback){
+    var bearerToken = 'bearer ' + localStorage.getItem('token');
+    $.ajax({
+        url: "/clinic/updateDoctor",
+        type: "POST",
+        data: data,
+        beforeSend: function (request) {
+            request.setRequestHeader('authorization', bearerToken);
+        },
+        contentType: 'application/json',
+        success: function (result) {
+            callback(result);
+        },
+        statusCode: {
+            403: function () {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+    });
+}

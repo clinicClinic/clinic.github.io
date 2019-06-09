@@ -75,7 +75,8 @@ var selectedLang = {
     n65: "Attended",
     n66: "Finished",
     n67: "More",
-    n68: "Update available schedule"
+    n68: "Update available schedule",
+    n68: "Available schedule",
 
   },
   ar: {
@@ -147,7 +148,9 @@ var selectedLang = {
     n65: "حضر" , 
     n66: "انتهى" ,
     n67: "المزيد",
-    n68: "تحديث الجدول الزمني المتاح"
+    n68: "تحديث الجدول الزمني المتاح",
+    n69: "اوقات التواجد",
+
 
 }
 };

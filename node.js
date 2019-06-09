@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var mysql = require('mysql');
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
 var bodyParser = require('body-parser');
 var jwt = require('jsonwebtoken');
 var http = require('http').Server(app);
@@ -101,6 +101,20 @@ app.post('/clinic/addDoctor', verifyToken, function (req, res) {
         insertDoctor(user, doctor, function (results) {
           res.send(results);
         });
+      });
+    }
+  });
+});
+app.post('/clinic/updateDoctor', verifyToken, function (req, res) {
+  jwt.verify(req.token, 'privateKey', function (err, authData) {
+    if (err) {
+      res.sendStatus(403);
+    }
+    else {
+      var doctor = req.body.doctor;
+
+      updateDoctor(doctor, function (results) {
+        res.send(results);
       });
     }
   });
@@ -219,7 +233,7 @@ app.post('/clinic/integratePatient', verifyToken, function (req, res) {
       res.sendStatus(403);
     }
     else {
-      integratePatient(req.body.user,req.body.patient, function (result) {
+      integratePatient(req.body.user, req.body.patient, function (result) {
         res.send(result);
       });
     }
@@ -314,7 +328,7 @@ function getClinicDoctors(email, callback) {
   var sql = 'SELECT clinic_id FROM users_2er31 WHERE email = ?';
   pool.query(sql, [email], function (error, resId) {
     if (error) throw error;
-    sql1 = 'SELECT doctors_12fdrv.id,user_id,fname,lname,specialty,gender,address FROM doctors_12fdrv inner join users_2er31 on doctors_12fdrv.user_id = users_2er31.id where clinic_id=? and role=4';
+    sql1 = 'SELECT doctors_12fdrv.id,user_id,fname,lname,nationality,specialty,gender,address,sec,birth_date,phone FROM doctors_12fdrv inner join users_2er31 on doctors_12fdrv.user_id = users_2er31.id where clinic_id=? and role=4';
     pool.query(sql1, [resId[0].clinic_id], function (error, results) {
       if (error) throw error;
       callback(results);
@@ -399,76 +413,76 @@ function insertPatient(patient, callback) {
   });
 
 }
-function insertPatient2(user,patient, callback) {
+function insertPatient2(user, patient, callback) {
   //check if patient already exsit
   //if yes return confirm adding to clinic with pid
   //if no insert pat to patient table get inserted id
 
-  sql = ' INSERT INTO patients_j45bsc(fname, lname, email, added_by_clinic, birth_date, nationality, phone,added_by) VALUES (?,?,?,?,?,?,?,?)';
-  pool.query(sql, [patient.fname, patient.lname, patient.email, user.clinic_id, patient.birth_date, patient.nationality, patient.phone, user.id], function (error, res) {
-    if (error){ 
-      if (error.code == "ER_DUP_ENTRY" || error.errno == 1062){
+  sql = ' INSERT INTO patients_j45bsc(fname, lname, email, added_by_clinic, birth_date, nationality, gender, phone,added_by) VALUES (?,?,?,?,?,?,?,?)';
+  pool.query(sql, [patient.fname, patient.lname, patient.email, user.clinic_id, patient.birth_date,patient.gender, patient.nationality, patient.phone, user.id], function (error, res) {
+    if (error) {
+      if (error.code == "ER_DUP_ENTRY" || error.errno == 1062) {
         // duplicate patient found
-        integratePatient(user,patient,function(){
+        integratePatient(user, patient, function () {
           callback("The patient already exsit, and added to your clinic");
         });
       }
       else
         throw error;
-     }
-    else{
+    }
+    else {
       sql1 = ' INSERT INTO patient_clinics (patient_id, clinic_id) VALUES (?,?)';
-      pool.query(sql1, [res.insertId,user.clinic_id], function (error1, ress) {
-        if (error1){
-          throw error1;      
+      pool.query(sql1, [res.insertId, user.clinic_id], function (error1, ress) {
+        if (error1) {
+          throw error1;
         }
-        else{
+        else {
           callback("Added Successfully");
         }
       });
     }
   });
 }
-function checkPat(clinic_id,patient_id){
+function checkPat(clinic_id, patient_id) {
   sql1 = ' SELECT * FROM patient_clinics WHERE clinic_id=? AND patient_id=?';
-      pool.query(sql1, [clinic_id,patient_id], function (error1, ress) {
-        if (error1){
-          throw error1;         
-        }
-        else{
-          //check if theres a result
-          return("already exsit");
-          //else
-          return("already exsit somewhere");
+  pool.query(sql1, [clinic_id, patient_id], function (error1, ress) {
+    if (error1) {
+      throw error1;
+    }
+    else {
+      //check if theres a result
+      return ("already exsit");
+      //else
+      return ("already exsit somewhere");
 
-        }
+    }
   });
 }
-function integratePatient(user,patient, callback) {
+function integratePatient(user, patient, callback) {
 
   sql0 = ' SELECT id FROM patients_j45bsc WHERE email=? OR phone=?';
-  pool.query(sql0, [patient.email,patient.phone], function (error0, res) {
-    if (error0){
-      throw error0;      
+  pool.query(sql0, [patient.email, patient.phone], function (error0, res) {
+    if (error0) {
+      throw error0;
     }
-    else{
+    else {
       //if no match found 
-      if(res.length == 0){
+      if (res.length == 0) {
         callback("no match found");
         return;
       }
       //else add the patient
       sql = ' INSERT INTO patient_clinics (patient_id, clinic_id) VALUES (?,?)';
-      pool.query(sql, [res[0].id,user.clinic_id], function (error, ress) {
-        if (error){ 
-          if (error.code == "ER_DUP_ENTRY" || error.errno == 1062){
+      pool.query(sql, [res[0].id, user.clinic_id], function (error, ress) {
+        if (error) {
+          if (error.code == "ER_DUP_ENTRY" || error.errno == 1062) {
             // duplicate patient found
             callback("The patient already exsit in your clinic");
           }
           else
             throw error;
-         }
-        else{
+        }
+        else {
           callback("Added Successfully");
         }
       });
@@ -483,4 +497,16 @@ function deleteUser(id, callback) {
     callback("Deleted Successfully");
   });
 }
+function updateDoctor(doctor, callback) {
+  sql = ' UPDATE doctors_12fdrv SET specialty=?,address=?,nationality=?,birth_date=?,gender=?,sec=? WHERE id=?';
+  pool.query(sql, [doctor.specialty,doctor.address,doctor.nationality,doctor.birth_date,doctor.gender,doctor.sec,doctor.id], function (error, ress) {
+    if (error) {
+      throw error;
+    }
+    else {
+      callback("Updated Successfully");
+    }
+  });
+}
+
 
