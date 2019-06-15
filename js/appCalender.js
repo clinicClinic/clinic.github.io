@@ -52,7 +52,6 @@ $(document).on("click", ".calPrev", function () {
 
 $(document).on("click", ".weeksBtn", function () {
   //update the week header dates
-  buildWeeksCalHelper();
   $(".slcted").attr("cid", "week");
   $(".calNext").attr("acid", "week");
   $(".calPrev").attr("acid", "week");
@@ -86,7 +85,16 @@ $(document).on("click", ".dayBtn", function () {
 });
 $(document).on("change", ".slcted", function (event) {
   var cid = $(this).attr("cid");
+  var id = $(this).attr("id");
+  var did = $("")
   renderApp();
+
+  if(id=="slctedDoc"){
+    var docId = $(this).val();
+    var doctor = obj.getDoctor(docId);
+    rendDocAvaTime(doctor.sec);
+  }
+
 
 });
 $(document).on("click", ".isMonthDayCell", function (event) {
@@ -265,6 +273,7 @@ function buildWeekscalendar(s, e, am) {
 }
 //this function builds the hourlly blocks of the weekly calendar $s = starting time $e ending time $am timing
 function buildDayHours(s, e, am) {
+  var weakdaysLetters = ["sa","su","mo","tu","we","th","fr"];
   var timePeroid = ['am', 'pm'];
   var v = "";
   for (var i = s; i < e; i++) {
@@ -272,11 +281,11 @@ function buildDayHours(s, e, am) {
       am = (am + 1) % 2;
     v += "<div class='weekly_calendar_box calendar_hov day'>" + (i % 12) + ":00 " + timePeroid[am] + "</div>";
     for (var k = 0; k < 7; k++) {
-      v += "<div appointmentCount='0' day-hour-cell='" + weekDaysDates[k] + "-" + i + ":00' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + (i + 1) + '","minutes":"0"}' + "'  class='toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day'></div>";
+      v += "<div appointmentCount='0' wkDyHr='"+weakdaysLetters[k]+i+"' day-hour-cell='" + weekDaysDates[k] + "-" + i + ":00' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + (i + 1) + '","minutes":"0"}' + "'  class='toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day'></div>";
     }
     v += "<div  class='weekly_calendar_box calendar_hov day'>--</div>";
     for (var j = 0; j < 7; j++) {
-      v += "<div appointmentCount='0' day-hour-cell='" + weekDaysDates[k] + "-" + i + ":30' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + (i + 1) + '","minutes":"30"}' + "'  class='toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day'></div>";
+      v += "<div appointmentCount='0' wkDyHr='"+weakdaysLetters[k]+i+"' day-hour-cell='" + weekDaysDates[k] + "-" + i + ":30' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + (i + 1) + '","minutes":"30"}' + "'  class='toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day'></div>";
     }
   }
   return v;
@@ -542,6 +551,7 @@ function calTran() {
     $(".calendar").html(buildMonthlycalendar());
   }
   else if (cid == "week") {
+    buildWeeksCalHelper();
     $(".calendar").html(buildWeekscalendar(0, 24, 0));
   }
   else {
@@ -549,5 +559,12 @@ function calTran() {
   }
 
   renderApp();
+}
+function rendDocAvaTime(sec){
+  sec = sec.split(" ");
 
+  for(var a in sec){
+    var wkDyHr = sec[a]; 
+    $(".isCalWeekCell[wkDyHr='"+wkDyHr+"']").css("background-color","#bbdefb");
+  }
 }
