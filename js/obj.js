@@ -59,6 +59,21 @@ export function getDocAppointments(id){
         return tempApp;
     }   
 }
+
+export function getDocBySpec(spec){
+    var doctors = localStorage.getItem('doctors');
+    doctors = JSON.parse(doctors);
+    var tempDocs = [];
+    var a;
+    if(doctors){
+        for(a in doctors){
+            if(doctors[a].specialty==spec){
+                tempDocs.push(doctors[a]);
+            }
+        }
+        return tempDocs;
+    }   
+}
 export function getAppointment(id){
     var appointments = localStorage.getItem('appointments');
     appointments = JSON.parse(appointments);

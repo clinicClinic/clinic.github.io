@@ -80,6 +80,8 @@ app.post('/reg', verifyToken, function (req, res) {
         user['clinic_id'] = req.body.user.clinic_id;
         user['added_by'] = req.body.user.id;
         user.password = hash;
+        console.log(user);
+
         insertUser(user, function (results) {
           res.send(results);
         });
@@ -95,9 +97,10 @@ app.post('/clinic/addDoctor', verifyToken, function (req, res) {
     else {
       var user = req.body.user;
       var doctor = req.body.doctor;
-      hashPass(user.password, function (err1, hash) {
+      hashPass(doctor.password, function (err1, hash) {
         if (err1) throw err1;
         doctor.password = hash;
+        console.log(doctor);
         insertDoctor(user, doctor, function (results) {
           res.send(results);
         });
@@ -179,6 +182,18 @@ app.post('/clinic/getAppointments', verifyToken, function (req, res) {
     }
   });
 });
+app.post('/clinic/getDocAppointments', verifyToken, function (req, res) {
+  jwt.verify(req.token, 'privateKey', function (err, authData) {
+    if (err) {
+      res.sendStatus(403);
+    }
+    else {
+      getDocAppointments(req.body.user.id, function (result) {
+        res.send(result);
+      });
+    }
+  });
+});
 app.post('/clinic/addAppointment', verifyToken, function (req, res) {
   jwt.verify(req.token, 'privateKey', function (err, authData) {
     if (err) {
@@ -251,6 +266,19 @@ app.post('/clinic/deleteUser', verifyToken, function (req, res) {
     }
   });
 });
+app.post('/clinic/updateAppointmentDrugs', verifyToken, function (req, res) {
+  jwt.verify(req.token, 'privateKey', function (err, authData) {
+    if (err) {
+      res.sendStatus(403);
+    }
+    else {
+
+      updateAppointmentDrugs(req.body, function (result) {
+        res.send(result);
+      });
+    }
+  });
+});
 function hashPass(pass, callback) {
   bcrypt.genSalt(10, function (err, salt) {
     bcrypt.hash(pass, salt, function (err, hash) {
@@ -278,6 +306,9 @@ function checkUserCred(email, pass, callback) {
   var sql = 'SELECT * FROM users_2er31 WHERE email = ? ';
   pool.query(sql, [email], function (error, results) {
     if (error) throw error;
+    if(!results[0]){
+      callback(false, '');
+      return;}
     //Load hash from your password DB.
     var hash = results[0].password;
     bcrypt.compare(pass, hash, function (err, res) {
@@ -286,8 +317,9 @@ function checkUserCred(email, pass, callback) {
         results[0].password = '';
         callback(true, JSON.stringify(results[0]));
       }
-      else
-        callback(false, '');
+      else{
+      callback(false, '');
+      }
     });
   });
 }
@@ -353,6 +385,17 @@ function getAppointments(user, callback) {
     callback(results);
   });
 }
+function getDocAppointments(id, callback) {
+  var sql = 'SELECT * FROM doctors_12fdrv WHERE user_id= ?';
+  pool.query(sql, [id], function (error, results) {
+    if (error) throw error;
+    var sql2 = 'SELECT * FROM appointments_3sd3df WHERE doctor_id= ?';
+    pool.query(sql2, [results[0].id], function (error2, results2) {
+      if (error2) throw error2;
+      callback(results2);
+    });
+  });
+}
 function insertDoctor(user, doctor, callback) {
   var sql = 'INSERT INTO users_2er31 (fname,lname,password,email,role,clinic_id,phone,added_by) values(?,?,?,?,?,?,?,?) ';
   pool.query(sql, [doctor.fname, doctor.lname, doctor.password, doctor.email, 4, user.clinic_id, doctor.phone, user.id], function (error, results) {
@@ -374,7 +417,7 @@ function insertDoctor(user, doctor, callback) {
 function insertAppointment(user, appointment, callback) {
   var date = appointment.year + "-" + appointment.month + "-" + appointment.day + " " + appointment.hour + ":" + appointment.minutes + ":0";
   var sql = 'INSERT INTO appointments_3sd3df (doctor_id, clinic_id, patient_id, specialty, comment, date, isBy, added_by) VALUES (?,?,?,?,?,?,?,?)';
-  pool.query(sql, [appointment.doctor, user.clinic_id, appointment.patient, appointment.specialty, appointment.comment, date, 0, user.id], function (error, results) {
+  pool.query(sql, [appointment.doctor, user.clinic_id, appointment.patient, appointment.specialty, appointment.comment, date,, 0, user.id], function (error, results) {
     if (error) throw error;
     io.emit("appointment added", "");
     callback("Added Successfully");
@@ -382,8 +425,8 @@ function insertAppointment(user, appointment, callback) {
 }
 function editAppointment(user, appointment, callback) {
   var date = appointment.year + "-" + appointment.month + "-" + appointment.day + " " + appointment.hour + ":" + appointment.minutes + ":0";
-  var sql = 'UPDATE appointments_3sd3df Set doctor_id=? , patient_id=? , specialty=? , date=? , added_by=? WHERE id=?';
-  pool.query(sql, [appointment.doctor, appointment.patient, appointment.specialty, date, user.id, appointment.id], function (error, results) {
+  var sql = 'UPDATE appointments_3sd3df Set doctor_id=? , patient_id=? , specialty=? , date=? , added_by=? , drugs=? WHERE id=?';
+  pool.query(sql, [appointment.doctor, appointment.patient, appointment.specialty, date, user.id ,appointment.drugs , appointment.id], function (error, results) {
     if (error) throw error;
     callback("Edited Successfully");
   });
@@ -500,6 +543,17 @@ function deleteUser(id, callback) {
 function updateDoctor(doctor, callback) {
   sql = ' UPDATE doctors_12fdrv SET specialty=?,address=?,nationality=?,birth_date=?,gender=?,sec=? WHERE id=?';
   pool.query(sql, [doctor.specialty,doctor.address,doctor.nationality,doctor.birth_date,doctor.gender,doctor.sec,doctor.id], function (error, ress) {
+    if (error) {
+      throw error;
+    }
+    else {
+      callback("Updated Successfully");
+    }
+  });
+}
+function updateAppointmentDrugs(data, callback) {
+  sql = ' UPDATE appointments_3sd3df SET drugs=? WHERE id=?';
+  pool.query(sql, [JSON.stringify(data.drugs),data.id], function (error, ress) {
     if (error) {
       throw error;
     }

@@ -1,0 +1,3 @@
+ -display appointment drug
+ -adding drugs should be generated from the appointment drug.
+ -suspend all socket functionality til later milestone.]

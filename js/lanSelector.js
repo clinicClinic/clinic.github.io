@@ -76,7 +76,10 @@ var selectedLang = {
     n66: "Finished",
     n67: "More",
     n68: "Update available schedule",
-    n68: "Available schedule",
+    n69: "Available schedule",
+    n70: "Add new Drug ",
+    n71: "Drug ",
+    n72: "Drugs ",
 
   },
   ar: {
@@ -150,6 +153,9 @@ var selectedLang = {
     n67: "المزيد",
     n68: "تحديث الجدول الزمني المتاح",
     n69: "اوقات التواجد",
+    n70: "إضافة عقار جديد ",
+    n71: "دواء",
+    n72: "الادوية ",
 
 
 }

@@ -32,7 +32,7 @@ $(document).ready(function () {
   $('.timeNode').mousedown(function () {
     $(this).css({ background: "#e3f2fd" });
   });
-  $(document).on("click",".timeNode",function(){
+  $(document).on("click", ".timeNode", function () {
     if ($(this).attr("slctd") == "false") {
       $(this).attr("slctd", "true");
       $(this).css({ background: "#e3f2fd" });
@@ -58,7 +58,13 @@ $(document).ready(function () {
     $(this).addClass("active");
   });
   $(document).on("click", "#appointmentNav", function () {
-    transTab("clnd");
+    var user = localStorage.getItem('user');
+    var user = JSON.parse(user);
+    if (user.role == 4)
+      docTransTab("clnd");
+    else
+      transTab("clnd");
+
     $(this).addClass("active");
   });
   $(document).on("click", "#docNav", function () {
@@ -135,7 +141,6 @@ $(document).ready(function () {
     var data = $(this).attr('app-data');
     // console.log(data);
     addAppointmentFields(JSON.parse(data));
-
   });
   $(document).on("click", ".toggleAddDoctorModal", function (event) {
 
@@ -211,7 +216,7 @@ $(document).ready(function () {
       $(this).val("");
       if (name == '' || val == '') {
         err = true;
-        // keep checking ??;
+        // TODO: login values are not checked;
       }
       s += '"' + name.toLowerCase() + '":"' + val + '",';
     });
@@ -220,6 +225,10 @@ $(document).ready(function () {
     if (!err) {
       //send user info to server
       req.login(s, function (token) {
+        if (!token || token == "invalid user or password") {
+          cAlert(token);
+          return;
+        }
         var tmp = token.split("  ");
 
         localStorage.setItem('user', tmp[1]);
@@ -234,7 +243,7 @@ $(document).ready(function () {
     var data = constructData(".addNewDocInp");
     if (data == "error")
       return;
-
+    console.log(data);
     var user = localStorage.getItem('user');
     data = '{"user":' + user + ',"doctor":' + data + '}';
     //send user info to server
@@ -244,7 +253,7 @@ $(document).ready(function () {
         req.getClinicUsers(function (users) {
           localStorage.setItem('doctors', JSON.stringify(doctors));
           localStorage.setItem('users', JSON.stringify(users));
-          transTab('clinic');
+          transTab('doc');
         });
       });
     });
@@ -342,6 +351,7 @@ $(document).ready(function () {
 
     var user = localStorage.getItem('user');
     data = '{"user":' + user + ',"appointment":' + data + '}';
+
     //send user info to server
     req.editAppointment(data, function (res) {
       cAlert(res);
@@ -353,6 +363,7 @@ $(document).ready(function () {
         var appointment = obj.getAppointment(id);
         $("#contentFirstRow").html("");
         $("#contentFirstRow").append(buildAppointmentCard(appointment));
+        $("#editAppointmentModal").modal("hide");
       });
     });
   });
@@ -384,17 +395,54 @@ $(document).ready(function () {
     var doctor = obj.getDoctor(id);
     doctor.sec = sec;
     var user = localStorage.getItem('user');
-    var data  = '{"user":' + user + ',"doctor":' + JSON.stringify(doctor) + '}';
+    var data = '{"user":' + user + ',"doctor":' + JSON.stringify(doctor) + '}';
     console.log(data);
-    req.updateDoctor(data,function(res){
+    req.updateDoctor(data, function (res) {
       cAlert(res);
-      req.getDoctors(function(doctors){
+      req.getDoctors(function (doctors) {
         localStorage.setItem('doctors', JSON.stringify(doctors));
       });
     });
   });
+  $(document).on("change", ".addAppDocSelct", function () {
+    // var docId = $(this).val();
+    // $('select[name="hour"]').val("");
+    // $('select[name="minutes"]').val("");
 
-
+    // if(docId!=""){
+    //   var doctor = obj.getDoctor(docId);
+    //   clearAppointmentTime(doctor);
+    // }
+    // else{
+    //   $('select[name="hour"] option').show();
+    //   $('select[name="minutes"] option').show();
+    // }
+  });
+  $(document).on("click", ".addMoreDrug", function () {
+    $(this).parent().parent().append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText("n71") + '</label> <input class="isDrug form-control col-sm-3"><label class="col-sm-2 col-form-label">' + lns.getText("n27") + '</label> <input name="count" class=" form-control col-sm-3"><button class="removeDrug  btn btn-danger">X</button></div><br>');
+  });
+  $(document).on("click", ".removeDrug", function () {
+    $(this).parent().remove();
+  });
+  $(document).on("click", ".editDrugsBtn", function () {
+    $(".noneEditableDrugs").hide();
+    $(this).hide();
+    $(".editableDrugs").show();
+    $(".addMoreDrug").show();
+    $(".addDrugBtn").show();
+  });
+  $(document).on("click", ".addDrugBtn", function () {
+    var id = $(this).attr("aid");
+    var data = '{"id":"' + id + '","drugs":' + getEditAppointmentDrugs() + '}';
+    console.log(data);
+    req.updateAppointmentDrugs(data, function (msg) {
+      cAlert(msg);
+      req.getDocAppointments(function (appointments) {
+        localStorage.setItem('appointments', JSON.stringify(appointments));
+        buildAppointmentCard(obj.getAppointment(id));
+      });
+    });
+  });
 
 });
 function checkIfLoggedIn() {
@@ -415,13 +463,39 @@ function displayCont() {
   var user = localStorage.getItem('user');
   var user = JSON.parse(user);
   $("#userName").text(user.fname + " " + user.lname);
-  $("#profileTab").attr("profileId", user.id)
-  buildSideBarItems();
-  var tab = localStorage.getItem("tab");
-  if (!tab || tab == "")
-    transTab("clnd");
-  else
-    transTab(tab);
+  $("#profileTab").attr("profileId", user.id);
+  if (user.role == 4) {
+    buildSideBarItems();
+    var tab = localStorage.getItem("tab");
+    if (!tab || tab == "")
+      docTransTab("clnd");
+    else
+      docTransTab(tab);
+  }
+  else {
+    buildSideBarItems();
+    var tab = localStorage.getItem("tab");
+    if (!tab || tab == "")
+      transTab("clnd");
+    else
+      transTab(tab);
+  }
+}
+function docTransTab(nxt) {
+  localStorage.setItem("tab", nxt);
+  $(".isNav").removeClass("active");
+  $("#contentFirstRow").html("");
+  $("#appendTopBox").html("");
+
+  loadDocData(function () {
+    if (nxt == "clinic") {
+      clinicCont();
+    }
+    else if (nxt == "clnd") {
+      appointmentCont(true);
+    }
+  });
+
 }
 function transTab(nxt) {
   localStorage.setItem("tab", nxt);
@@ -437,7 +511,7 @@ function transTab(nxt) {
       clinicCont();
     }
     else if (nxt == "clnd") {
-      appointmentCont();
+      appointmentCont(false);
     }
     else if (nxt == "pat") {
       patintCont();
@@ -461,19 +535,15 @@ function constructData(fld) {
   $(fld).each(function () {
     var name = $(this).attr('name');
     var val = $(this).val();
-    $(this).val("");
-
 
     if (!checkFields(name, val))
       error = true;
 
 
-    if (name != "email" && name != "password")
+    if (name == "email" || name == "reEmail" || name == "password" || name == "rePassowrd")
       s += '"' + name.toLowerCase() + '":"' + val + '",';
     else
       s += '"' + name.toLowerCase() + '":"' + val.toLowerCase().trim().replace(/ +(?= )/g, '') + '",';
-
-
   });
   s = s.substring(0, s.length - 1);
   s += '}';
@@ -603,17 +673,26 @@ function usersCont() {
   }
 
 }
-function appointmentCont(){
-  appo.rend();
-  var doctors = localStorage.getItem('doctors');
-  var patients = localStorage.getItem('patients');
-  var appointments = localStorage.getItem('appointments');
-  doctors = JSON.parse(doctors);
-  patients = JSON.parse(patients);
-  appointments = JSON.parse(appointments);
-  $("#contentFirstRow").append(buildAddAppointmentCard(patients, doctors, false));
-  $("#contentFirstRow").append(buildAppointmentslistCard(appointments));
-  addAppointmentFields("");
+function appointmentCont(isDoc) {
+  if (isDoc) {
+    appo.rend();
+    var appointments = localStorage.getItem('appointments');
+    appointments = JSON.parse(appointments);
+    $("#contentFirstRow").append(buildAppointmentslistCard(appointments));
+  }
+  else {
+    appo.rend();
+    var doctors = localStorage.getItem('doctors');
+    var patients = localStorage.getItem('patients');
+    var appointments = localStorage.getItem('appointments');
+    doctors = JSON.parse(doctors);
+    patients = JSON.parse(patients);
+    appointments = JSON.parse(appointments);
+    $("#contentFirstRow").append(buildAddAppointmentCard(patients, doctors, false));
+    $("#contentFirstRow").append(buildAppointmentslistCard(appointments));
+    addAppointmentFields("");
+  }
+
 }
 //---------------------------------------------------- render helpers
 function addChart(id) {
@@ -1248,6 +1327,12 @@ function buildSideBarItems() {
   else if (role == 3) {
     $('#sideBar').append('<li id="clinicNav" class="clickable isNav nav-item "><a class="nav-link" ><i class="fas fa-fw fa-tachometer-alt"></i><span>' + lns.getText('n2') + '</span></a></li>');
   }
+  else if (role == 4) {
+    $('#sideBar').append('<li id="clinicNav" class="clickable isNav nav-item "><a class="nav-link" ><i class="fas fa-fw fa-tachometer-alt"></i><span>' + lns.getText('n2') + '</span></a></li>');
+    $('#sideBar').append(hr);
+    $('#sideBar').append('<li id="appointmentNav" class="clickable isNav nav-item "><a class="nav-link" ><i class="fas fa-fw fa-calendar-alt"></i><span>' + lns.getText('n42') + '</span></a></li>');
+    return;
+  }
   $('#sideBar').append(hr);
   $('#sideBar').append('<li id="appointmentNav" class="clickable isNav nav-item "><a class="nav-link" ><i class="fas fa-fw fa-calendar-alt"></i><span>' + lns.getText('n42') + '</span></a></li>');
   $('#sideBar').append('<li id="docNav" class="clickable isNav nav-item "><a class="nav-link" ><i class="fas fa-fw fa-user-md"></i><span>' + lns.getText('n5') + '</span></a></li>');
@@ -1269,7 +1354,7 @@ function buildAddDoctorCard1() {
   row.append(col2);
   cardheader.append(row);
 
-// todo ????????
+  // todo ????????
 
   var cardBody = $("<div/>").addClass("card-body");
   var br = $("<br/>");
@@ -1282,11 +1367,11 @@ function buildAddDoctorCard1() {
   cardBody.append(br.clone());
   cardBody.append('<div class="row"><label class="col-sm-3 col-form-label">' + lns.getText('n14') + '</label><input name="phone" class="addNewDocInp form-control col-sm-3"><label class="col-sm-3 col-form-label">' + lns.getText('n22') + '</label><textarea  name="about" class="addNewDocInp form-control col-sm-3"></textarea></div>');
   cardBody.append(br.clone());
-  cardBody.append('<div class="row"><label class="col-sm-3 col-form-label">' + lns.getText('n20') + '</label><input name="specialty" class="addNewDocInp form-control col-sm-3"><label class="col-sm-3 col-form-label">' + lns.getText('n23') + '</label><input name="address" class="addNewDocInp form-control col-sm-3"></div>');
+  cardBody.append('<div class="row"><label class="col-sm-3 col-form-label">' + lns.getText('n20') + '</label><select name="specialty" class="addNewDocInp form-control col-sm-3">' + specOptions() + '</select><label class="col-sm-3 col-form-label">' + lns.getText('n23') + '</label><input name="address" class="addNewDocInp form-control col-sm-3"></div>');
   cardBody.append(br.clone());
-  cardBody.append('<div class="row"><label class="col-sm-3 col-form-label">' + lns.getText('n21') + '</label><select name="nationality" class="addNewDocInp form-control col-sm-3">'+nationalityOptions()+'</select><label class="col-sm-3 col-form-label">' + lns.getText('n48') + '</label><select name="gender" class="addNewDocInp form-control col-sm-3"><option value="male">male</option><option value="female">female</option></select></div>');
+  cardBody.append('<div class="row"><label class="col-sm-3 col-form-label">' + lns.getText('n21') + '</label><select name="nationality" class="addNewDocInp form-control col-sm-3">' + nationalityOptions() + '</select><label class="col-sm-3 col-form-label">' + lns.getText('n48') + '</label><select name="gender" class="addNewDocInp form-control col-sm-3"><option value="male">male</option><option value="female">female</option></select></div>');
   cardBody.append(br.clone());
-  cardBody.append('<div class="row"><label class="col-sm-3 col-form-label">' + lns.getText('n24') + '</label><input name="birth_date" class="form-control col-sm-3" ></div>');
+  cardBody.append('<div class="row"><label class="col-sm-3 col-form-label">' + lns.getText('n24') + '</label><input name="birth_date" class="addNewDocInp form-control col-sm-3" ></div>');
   cardBody.append(br.clone());
   cardBody.append('<div class="row"><label class="col-sm-3 col-form-label">' + lns.getText('n16') + '</label><button class="addNewDocBtn btn btn-success">' + lns.getText('n16') + '</button></div>');
 
@@ -1329,7 +1414,7 @@ function buildAddPaitentCard() {
   cardBody.append(br.clone());
   cardBody.append('<div class="row"><label class="col-sm-3 col-form-label">' + lns.getText('n14') + '</label><input name="phone" class="addNewPatInp form-control col-sm-3"><label class="col-sm-3 col-form-label">' + lns.getText('n23') + '</label><input name="address" class="addNewPatInp form-control col-sm-3">');
   cardBody.append(br.clone());
-  cardBody.append('<div class="row"><label class="col-sm-3 col-form-label">' + lns.getText('n21') + '</label><select name="nationality" class="addNewPatInp form-control col-sm-3">'+nationalityOptions()+'<select><label class="col-sm-3 col-form-label">' + lns.getText('n24') + '</label><input name="birth_date" class="addNewPatInp form-control col-sm-3">');
+  cardBody.append('<div class="row"><label class="col-sm-3 col-form-label">' + lns.getText('n21') + '</label><select name="nationality" class="addNewPatInp form-control col-sm-3">' + nationalityOptions() + '<select><label class="col-sm-3 col-form-label">' + lns.getText('n24') + '</label><input name="birth_date" class="addNewPatInp form-control col-sm-3">');
   cardBody.append(br.clone());
   cardBody.append('<div class="row"><label class="col-sm-3 col-form-label">' + lns.getText('n48') + '</label><select name="nationality" class="addNewPatInp form-control col-sm-3"><option value="male">male</option><option value="feale" >female</option><select></div>');
   cardBody.append(br.clone());
@@ -1356,6 +1441,34 @@ function loadClinicData(callback) {
       req.getDoctors(function (doctors) {
         req.getClinicPatients(function (patients) {
           req.getAppointments(function (appointments) {
+            req.getClinicUsers(function (users) {
+              localStorage.setItem('clinic', JSON.stringify(clinic));
+              localStorage.setItem('doctors', JSON.stringify(doctors));
+              localStorage.setItem('patients', JSON.stringify(patients));
+              localStorage.setItem('appointments', JSON.stringify(appointments));
+              localStorage.setItem('users', JSON.stringify(users));
+              callback();
+            });
+          });
+        });
+      });
+    });
+  }
+}
+function loadDocData(callback) {
+  var clinic = localStorage.getItem('clinic');
+  var doctors = localStorage.getItem('doctors');
+  var patients = localStorage.getItem('patients');
+  var appointments = localStorage.getItem('appointments');
+  var users = localStorage.getItem('users');
+  if (clinic && doctors && patients && appointments && users) {
+    callback();
+  }
+  else {
+    req.getClinic(function (clinic) {
+      req.getDoctors(function (doctors) {
+        req.getClinicPatients(function (patients) {
+          req.getDocAppointments(function (appointments) {
             req.getClinicUsers(function (users) {
               localStorage.setItem('clinic', JSON.stringify(clinic));
               localStorage.setItem('doctors', JSON.stringify(doctors));
@@ -1413,7 +1526,7 @@ function buildAvaliableTime(did) {
 
 }
 function timeSec(did) {
-  var daysL = ['sa','su','mo','tu','we','th','fr'];
+  var daysL = ['sa', 'su', 'mo', 'tu', 'we', 'th', 'fr'];
   var res = "";
   res += '<div class="row border-left border-top border-bottom">';
   res += '<div  class="  col border-right border-grey">sat</div>';
@@ -1427,36 +1540,36 @@ function timeSec(did) {
   for (var i = 0; i < 23; i++) {
     res += '<div class="row border-left border-top border-bottom">';
     for (var j = 0; j < 7; j++) {
-      res += '<div slctd="false" timeSec="'+daysL[j]+''+i+' " class="noselect timeNode col border-right border-grey">' + i + ':00</div>';
+      res += '<div slctd="false" timeSec="' + daysL[j] + '' + i + ' " class="noselect timeNode col border-right border-grey">' + i + ':00</div>';
     }
     res += '</div>';
   }
   res += '<div class="row border-left border-top border-bottom">';
   res += '<br>';
-  res += '<button  did="'+did+'" class="setTimeSecBtn btn btn-success">'+lns.getText("n68");+' </button>';
+  res += '<button  did="' + did + '" class="setTimeSecBtn btn btn-success">' + lns.getText("n68"); +' </button>';
   res += '</div>';
   return res;
 }
-function setTimeSec(sec){
-  if(sec=="")
+function setTimeSec(sec) {
+  if (sec == "")
     return;
 
-  $('.timeNode').each(function(){
+  $('.timeNode').each(function () {
     var time = $(this).attr("timeSec");
-    if(sec.indexOf(time) !== -1){
+    if (sec.indexOf(time) !== -1) {
       $(this).attr("slctd", "true");
       $(this).css({ background: "#e3f2fd" });
     }
   });
 }
-function getTimeSec(){
-  var setTime ="";
-  $('.timeNode[slctd="true"]').each(function(){
-    setTime+= $(this).attr('timeSec');
+function getTimeSec() {
+  var setTime = "";
+  $('.timeNode[slctd="true"]').each(function () {
+    setTime += $(this).attr('timeSec');
   });
   return setTime;
 }
-function nationalityOptions(){
+function nationalityOptions() {
   return '  <option value="">-- select one --</option>  <option value="afghan">Afghan</option>  <option value="albanian">Albanian</option>  <option value="algerian">Algerian</option>  <option value="american">American</option>  <option value="andorran">Andorran</option>  <option value="angolan">Angolan</option>  <option value="antiguans">Antiguans</option>  <option value="argentinean">Argentinean</option>  <option value="armenian">Armenian</option>  <option value="australian">Australian</option>  <option value="austrian">Austrian</option>  <option value="azerbaijani">Azerbaijani</option>  <option value="bahamian">Bahamian</option>  <option value="bahraini">Bahraini</option>  <option value="bangladeshi">Bangladeshi</option>  <option value="barbadian">Barbadian</option>  <option value="barbudans">Barbudans</option>  <option value="batswana">Batswana</option>  <option value="belarusian">Belarusian</option>  <option value="belgian">Belgian</option>  <option value="belizean">Belizean</option>  <option value="beninese">Beninese</option>  <option value="bhutanese">Bhutanese</option>  <option value="bolivian">Bolivian</option>  <option value="bosnian">Bosnian</option>  <option value="brazilian">Brazilian</option>  <option value="british">British</option>  <option value="bruneian">Bruneian</option>  <option value="bulgarian">Bulgarian</option>  <option value="burkinabe">Burkinabe</option>  <option value="burmese">Burmese</option>  <option value="burundian">Burundian</option>  <option value="cambodian">Cambodian</option>  <option value="cameroonian">Cameroonian</option>  <option value="canadian">Canadian</option>  <option value="cape verdean">Cape Verdean</option>  <option value="central african">Central African</option>  <option value="chadian">Chadian</option>  <option value="chilean">Chilean</option>  <option value="chinese">Chinese</option>  <option value="colombian">Colombian</option>  <option value="comoran">Comoran</option>  <option value="congolese">Congolese</option>  <option value="costa rican">Costa Rican</option>  <option value="croatian">Croatian</option>  <option value="cuban">Cuban</option>  <option value="cypriot">Cypriot</option>  <option value="czech">Czech</option>  <option value="danish">Danish</option>  <option value="djibouti">Djibouti</option>  <option value="dominican">Dominican</option>  <option value="dutch">Dutch</option>  <option value="east timorese">East Timorese</option>  <option value="ecuadorean">Ecuadorean</option>  <option value="egyptian">Egyptian</option>  <option value="emirian">Emirian</option>  <option value="equatorial guinean">Equatorial Guinean</option>  <option value="eritrean">Eritrean</option>  <option value="estonian">Estonian</option>  <option value="ethiopian">Ethiopian</option>  <option value="fijian">Fijian</option>  <option value="filipino">Filipino</option>  <option value="finnish">Finnish</option>  <option value="french">French</option>  <option value="gabonese">Gabonese</option>  <option value="gambian">Gambian</option>  <option value="georgian">Georgian</option>  <option value="german">German</option>  <option value="ghanaian">Ghanaian</option>  <option value="greek">Greek</option>  <option value="grenadian">Grenadian</option>  <option value="guatemalan">Guatemalan</option>  <option value="guinea-bissauan">Guinea-Bissauan</option>  <option value="guinean">Guinean</option>  <option value="guyanese">Guyanese</option>  <option value="haitian">Haitian</option>  <option value="herzegovinian">Herzegovinian</option>  <option value="honduran">Honduran</option>  <option value="hungarian">Hungarian</option>  <option value="icelander">Icelander</option>  <option value="indian">Indian</option>  <option value="indonesian">Indonesian</option>  <option value="iranian">Iranian</option>  <option value="iraqi">Iraqi</option>  <option value="irish">Irish</option>  <option value="israeli">Israeli</option>  <option value="italian">Italian</option>  <option value="ivorian">Ivorian</option>  <option value="jamaican">Jamaican</option>  <option value="japanese">Japanese</option>  <option value="jordanian">Jordanian</option>  <option value="kazakhstani">Kazakhstani</option>  <option value="kenyan">Kenyan</option>  <option value="kittian and nevisian">Kittian and Nevisian</option>  <option value="kuwaiti">Kuwaiti</option>  <option value="kyrgyz">Kyrgyz</option>  <option value="laotian">Laotian</option>  <option value="latvian">Latvian</option>  <option value="lebanese">Lebanese</option>  <option value="liberian">Liberian</option>  <option value="libyan">Libyan</option>  <option value="liechtensteiner">Liechtensteiner</option>  <option value="lithuanian">Lithuanian</option>  <option value="luxembourger">Luxembourger</option>  <option value="macedonian">Macedonian</option>  <option value="malagasy">Malagasy</option>  <option value="malawian">Malawian</option>  <option value="malaysian">Malaysian</option>  <option value="maldivan">Maldivan</option>  <option value="malian">Malian</option>  <option value="maltese">Maltese</option>  <option value="marshallese">Marshallese</option>  <option value="mauritanian">Mauritanian</option>  <option value="mauritian">Mauritian</option>  <option value="mexican">Mexican</option>  <option value="micronesian">Micronesian</option>  <option value="moldovan">Moldovan</option>  <option value="monacan">Monacan</option>  <option value="mongolian">Mongolian</option>  <option value="moroccan">Moroccan</option>  <option value="mosotho">Mosotho</option>  <option value="motswana">Motswana</option>  <option value="mozambican">Mozambican</option>  <option value="namibian">Namibian</option>  <option value="nauruan">Nauruan</option>  <option value="nepalese">Nepalese</option>  <option value="new zealander">New Zealander</option>  <option value="ni-vanuatu">Ni-Vanuatu</option>  <option value="nicaraguan">Nicaraguan</option>  <option value="nigerien">Nigerien</option>  <option value="north korean">North Korean</option>  <option value="northern irish">Northern Irish</option>  <option value="norwegian">Norwegian</option>  <option value="omani">Omani</option>  <option value="pakistani">Pakistani</option>  <option value="palauan">Palauan</option>  <option value="panamanian">Panamanian</option>  <option value="papua new guinean">Papua New Guinean</option>  <option value="paraguayan">Paraguayan</option>  <option value="peruvian">Peruvian</option>  <option value="polish">Polish</option>  <option value="portuguese">Portuguese</option>  <option value="qatari">Qatari</option>  <option value="romanian">Romanian</option>  <option value="russian">Russian</option>  <option value="rwandan">Rwandan</option>  <option value="saint lucian">Saint Lucian</option>  <option value="salvadoran">Salvadoran</option>  <option value="samoan">Samoan</option>  <option value="san marinese">San Marinese</option>  <option value="sao tomean">Sao Tomean</option>  <option value="saudi">Saudi</option>  <option value="scottish">Scottish</option>  <option value="senegalese">Senegalese</option>  <option value="serbian">Serbian</option>  <option value="seychellois">Seychellois</option>  <option value="sierra leonean">Sierra Leonean</option>  <option value="singaporean">Singaporean</option>  <option value="slovakian">Slovakian</option>  <option value="slovenian">Slovenian</option>  <option value="solomon islander">Solomon Islander</option>  <option value="somali">Somali</option>  <option value="south african">South African</option>  <option value="south korean">South Korean</option>  <option value="spanish">Spanish</option>  <option value="sri lankan">Sri Lankan</option>  <option value="sudanese">Sudanese</option>  <option value="surinamer">Surinamer</option>  <option value="swazi">Swazi</option>  <option value="swedish">Swedish</option>  <option value="swiss">Swiss</option>  <option value="syrian">Syrian</option>  <option value="taiwanese">Taiwanese</option>  <option value="tajik">Tajik</option>  <option value="tanzanian">Tanzanian</option>  <option value="thai">Thai</option>  <option value="togolese">Togolese</option>  <option value="tongan">Tongan</option>  <option value="trinidadian or tobagonian">Trinidadian or Tobagonian</option>  <option value="tunisian">Tunisian</option>  <option value="turkish">Turkish</option>  <option value="tuvaluan">Tuvaluan</option>  <option value="ugandan">Ugandan</option>  <option value="ukrainian">Ukrainian</option>  <option value="uruguayan">Uruguayan</option>  <option value="uzbekistani">Uzbekistani</option>  <option value="venezuelan">Venezuelan</option>  <option value="vietnamese">Vietnamese</option>  <option value="welsh">Welsh</option>  <option value="yemenite">Yemenite</option>  <option value="zambian">Zambian</option>  <option value="zimbabwean">Zimbabwean</option>';
 }
 //------------------------------------------------------------------------ appointment related functions 
@@ -1480,6 +1593,7 @@ function buildEditAppointmentCard(appointment, patients, doctors) {
 
   var cardBody = $("<div/>").addClass("card-body");
   var br = $("<br/>");
+  var divider = $("<hr/>").addClass("sidebar-divider");
 
   var m = dropDwons('m', "editAppInp");
   var y = dropDwons('y', "editAppInp");
@@ -1497,7 +1611,12 @@ function buildEditAppointmentCard(appointment, patients, doctors) {
   cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n20') + '</label><select  name="specialty" class="editAppInp form-control col-sm-3">' + specOptions() + '</select</div>');
   cardBody.append(br.clone());
   cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n16') + '</label><button  appointmentId="' + appointment.id + '" class="editAppInpBtn btn btn-success">' + lns.getText('n31') + '</button></div>');
+  cardBody.append(br.clone());
+  cardBody.append(divider.clone());
+  cardBody.append(br.clone());
 
+  if (isDocc()) {
+  }
 
   var cardShadow = $("<div/>").addClass("card shadow ");
   cardShadow.append(cardheader);
@@ -1624,14 +1743,42 @@ function buildAppointmentCard(appointment) {
                   </div>');
   cardBody.append(br.clone());
   cardBody.append(appointmentStatusBtns(appointment.id, appointment.stat));
-  cardBody.append(divider.clone());
-  cardBody.append(br.clone());
-  cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n27') + '</label><label class="col-sm-2 col-form-label mdl-color-text--teal-500">' + appointment.comment + '</label></div>');
+  if (isDocc()) {
+    cardBody.append(br.clone());
+    cardBody.append(divider.clone());
+  
+    cardBody.append(br.clone());
+    cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText("n72") + '</label><button  style="display:none" class="addMoreDrug btn btn-info">' + lns.getText('n70') + '</button><button aid="' + appointment.id + '" style="display:none" class=" addDrugBtn btn btn-info">' + lns.getText('n58') + '</button><button class="editDrugsBtn btn btn-info">' + lns.getText('n30') + '</button></div>');
+   
+  } else {
+    cardBody.append(br.clone());
+    cardBody.append('<div class="row"><label class="col-sm-2 col-form-label"></label><button aid="' + appointment.id + '" class="edtAppointmentShow btn btn-warning">' + lns.getText('n30') + '</button></div>');
+    cardBody.append(br.clone());
+    cardBody.append(divider.clone());
+  
+    cardBody.append(br.clone());
+    cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText("n72") + '</label></div>');
+   
+  }
+  var hiddenRow = $("<span/>").addClass("editableDrugs").attr("style", "display:none");
+  var visableRow = $("<span/>").addClass("noneEditableDrugs");
 
   cardBody.append(br.clone());
-  cardBody.append('<div class="row"><label class="col-sm-2 col-form-label"></label><textarea  name="comment" class="addNewAppInp form-control col-sm-8"></textarea><button class=" btn btn-success">' + lns.getText('n58') + '</button></div>');
-  cardBody.append(br.clone());
-  cardBody.append('<div class="row"><label class="col-sm-2 col-form-label"></label><button aid="' + appointment.id + '" class="edtAppointmentShow btn btn-warning">' + lns.getText('n30') + '</button></div>');
+  var drugs = JSON.parse(appointment.drugs);
+  if (drugs) {
+    for (var a in drugs) {
+      hiddenRow.append(br.clone());
+      visableRow.append(br.clone());
+      hiddenRow.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText("n71") + '</label> <input value="' + drugs[a].name + '" class="isDrug form-control col-sm-3"><label class="col-sm-2 col-form-label">' + lns.getText("n27") + '</label> <input name="count" value="' + drugs[a].count + '" class=" form-control col-sm-3"> <button class="removeDrug btn btn-danger">X</button></div><br>');
+      visableRow.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText("n71") + '</label> <lable class="col-sm-3 col-form-label">' + drugs[a].name + '</lable><label class="col-sm-2 col-form-label">' + lns.getText("n27") + '</label> <lable  class=" col-sm-3 col-form-label">' + drugs[a].count + '<lable></div><br>');
+    }
+  }
+  hiddenRow.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText("n71") + '</label> <input class="isDrug form-control col-sm-3"><label class="col-sm-2 col-form-label">' + lns.getText("n27") + '</label> <input name="count"  class=" form-control col-sm-3"> <button class="removeDrug btn btn-danger">X</button></div><br>');
+  cardBody.append(visableRow);
+  cardBody.append(hiddenRow);
+
+  
+
 
   var cardShadow = $("<div/>").addClass(" shadow mb-4");
   cardShadow.append(cardheader);
@@ -1668,7 +1815,7 @@ function dropDwons(menue, inp) {
   h += '</select>';
 
   var mn = '<select name="minutes" class="' + inp + ' form-control col-sm-2">';
-  for (var i = 0; i < 60; i += 10) {
+  for (var i = 0; i <= 30; i += 30) {
     mn += '<option value="' + i + '">' + i + '</option>';
   }
   mn += '</select>';
@@ -1685,11 +1832,11 @@ function dropDwons(menue, inp) {
     return mn;
 }
 function buildDoctorAndPatientOption(patients, doctors, inp) {
-  var res = '<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n39') + '</label><select name="doctor" class="' + inp + ' form-control col-sm-4" >';
+  var res = '<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n39') + '</label><select  name="doctor" class="' + inp + ' addAppDocSelct form-control col-sm-4" ><option value="" >' + lns.getText("n60") + '</option>';
   for (var a in doctors) {
     res += '<option value="' + doctors[a].id + '">' + doctors[a].fname + ',' + doctors[a].lname + '</option>';
   }
-  res += '</select><label class="col-sm-2 col-form-label">' + lns.getText('n40') + '</label><select name="patient" class="' + inp + ' form-control col-sm-4">';
+  res += '</select><label class="col-sm-2 col-form-label">' + lns.getText('n40') + '</label><select name="patient" class="' + inp + '  form-control col-sm-4"><option value="" >' + lns.getText("n60") + '</option>';
   for (var a in patients) {
     res += '<option value="' + patients[a].id + '">' + patients[a].fname + ',' + patients[a].lname + '</option>';
   }
@@ -1789,6 +1936,28 @@ function appointmentStatusBtns(id, stat) {
     </div>';
   }
 
+}
+function getEditAppointmentDrugs() {
+  var drugs = '[';
+  var error = false;
+  $(".isDrug").each(function () {
+    var drug = $(this).val().toLowerCase().trim().replace(/ +(?= )/g, '');
+    var comment = $(this).next().next().val().toLowerCase().trim().replace(/ +(?= )/g, '');
+
+    if (drug == "" || comment == "")
+      error = true;
+
+    drugs += '{"name":"' + drug + '","count":"' + comment + '"},';
+  });
+  if (error) {
+    cAlert("empty fields");
+    return "error";
+  }
+  else {
+    drugs = drugs.substring(0, drugs.length - 1);
+    drugs += "]";
+    return drugs;
+  }
 }
 //------------------------------------------------------------------------- display appointment list + clinic profile ----------------------------------
 function buildMyClinicCont(clinic) {
@@ -2149,8 +2318,37 @@ function buildUsersListBody(clinicUsers) {
 
   return calendar;
 }
+function clearAppointmentTime(doctor) {
+  if (!doctor)
+    return;
+
+  var appointments = obj.getDocAppointments(doctor.id);
+  if (!appointments)
+    return;
+
+  //clear all appointment time
+  for (var a in appointments) {
+    var time = appointments[a].date;
+    time = time.split("T");
+    time = time[1];
+    time = time.split(":");
+    var h = time[0];
+    var h = parseInt(time[0]);
+    var m = parseInt(time[1]);
 
 
+    $('select[name="hour"] option[value="' + h + '"]').hide();
+
+  }
+  //clear all not avaliable time
+}
+function isDocc() {
+  var isDoc = false;
+  var user = localStorage.getItem('user');
+  var user = JSON.parse(user);
+  if (user.role == 4) { isDoc = true }
+  return isDoc;
+}
 
 
 

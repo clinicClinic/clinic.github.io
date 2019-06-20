@@ -11,9 +11,11 @@ var daysString = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Frida
 import * as lns from './lanSelector.js';
 import * as obj from './obj.js';
 
+buildWeeksCalHelper();
 
 //listeners 
 $(document).on("click", ".calNext", function () {
+
   var acid = $(this).attr("acId");
   if (acid == "month") {
     day = monthDays;
@@ -28,9 +30,12 @@ $(document).on("click", ".calNext", function () {
 
   calTran();
   renderApp();
+  console.log(day);
 
 });
 $(document).on("click", ".calPrev", function () {
+  console.log(day);
+
   var acid = $(this).attr("acId");
   if (acid == "month") {
     day = 1;
@@ -46,6 +51,7 @@ $(document).on("click", ".calPrev", function () {
 
   calTran();
   renderApp();
+  console.log(day);
 
 });
 
@@ -71,7 +77,7 @@ $(document).on("click", ".monthsBtn", function () {
   var tmpDate = new Date(year, month);
   dayOffset = tmpDate.getDay();
   $(".slcted").attr("cid", "month");
-  calTran("month");
+  calTran();
 });
 $(document).on("click", ".dayBtn", function () {
   $(".slcted").attr("cid", "day");
@@ -81,7 +87,6 @@ $(document).on("click", ".dayBtn", function () {
   localStorage.setItem("slctdCalView", "day");
 
   calTran();
-  renderApp();
 });
 $(document).on("change", ".slcted", function (event) {
   var cid = $(this).attr("cid");
@@ -91,8 +96,24 @@ $(document).on("change", ".slcted", function (event) {
 
   if(id=="slctedDoc"){
     var docId = $(this).val();
-    var doctor = obj.getDoctor(docId);
-    rendDocAvaTime(doctor.sec);
+    if(docId=="")
+      clearAllCells();
+    else{
+      var doctor = obj.getDoctor(docId);
+      blockAllCells();
+      rendDocAvaTime(doctor.sec);
+    }
+  }else{
+    var docSpec = $(this).val();
+    if(docSpec=="")
+      clearAllCells();
+    else{
+      var doctors = obj.getDocBySpec(docSpec);
+      blockAllCells();
+      for(var a in doctors){
+        rendDocAvaTime(doctors[a].sec);
+      }
+    }
   }
 
 
@@ -111,7 +132,11 @@ $(document).on("click", ".isMonthDayCell", function (event) {
   renderApp();
 });
 export function rend() {
-  appointmentCont();
+  var isDoc = isDocc();
+  
+  
+  
+  appointmentCont(isDoc);
   calTran();
 }
 
@@ -119,7 +144,7 @@ export function rend() {
 //------------------------------------------------------------------monthly calendar------------------------------------------------------------------
 
 //this function renders the main appointment Monthly calendar ?!
-function appointmentCont() {
+function appointmentCont(isDoc) {
   var weekBtn = $("<a/>").addClass("weeksBtn btn-sm animated-button thar-one").text(lns.getText('n53'));
   var monthBtn = $("<a/>").addClass("monthsBtn btn-sm animated-button thar-one").text(lns.getText('n54'));
   var dayBtn = $("<a/>").addClass("dayBtn btn-sm animated-button thar-one").text(lns.getText('n55'));
@@ -153,20 +178,22 @@ function appointmentCont() {
 
   var br = $("<br/>");
   var cardBody = $("<div/>").addClass("card-body");
-  cardBody.append(selectionHeader("month"));
+  
+  if(!isDoc){cardBody.append(selectionHeader("month"));}
+
   cardBody.append(br.clone());
   cardBody.append(calHeaderRow);
   cardBody.append(br);
   cardBody.append("<div class='calendar' ></div>");
 
   var headerH4 = $("<h4/>").addClass("m-0 font-weight-bold text-primary").append("<span/>").text(lns.getText('n42'));
-  var addAppointmentBtn = $("<button/>").addClass("toggleAppointmentCard dropShadHov mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored").attr('app-data', '{"month":"' + month + '"}').text("+");
+  var addAppointmentBtn = $("<button/>").addClass("toggleAppointmentCard dropShadHov mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored").attr('app-data', '{"year":"' + year + '","month":"' + month + '","day":"' + day + '"}').text("+");
   var headerCol0 = $("<div/>").addClass("col-auto");
   var headerCol1 = $("<div/>").addClass("col-auto");
   var headerRow = $("<div/>").addClass("row");
   var cardheader = $("<div/>").addClass("card-header py-3");
   headerCol0.append(headerH4);
-  headerCol1.append(addAppointmentBtn);
+  if(!isDoc){headerCol1.append(addAppointmentBtn);}
   headerRow.append(headerCol0);
   headerRow.append(headerCol1);
   cardheader.append(headerRow);
@@ -227,20 +254,24 @@ function buildCalWeek(dayStart) {
   return '<div class="monthly_calendar_body">' + days + '</div>';
 }
 //------------------------------------------------------------------------------------------- dayly calender functions
-function buildDaylycalendar() {
+function buildDaylycalendar(isDoc) {
+  var classes = "toggleAppointmentCard calendar_hov clickable ";
+  if(isDoc){
+    classes="";
+  }
   var daysArray = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
   var tempDay = new Date(year, month, day);
   var v = "";
-  v += '<div class="dayly_calendar_box  day">HR</div>';
-  v += '<div class="dayly_calendar_box  day"><center>' + months[month] + '-' + daysArray[tempDay.getDay()] + '-' + day + '</center></div>';
+  v += '<div class="dayly_calendar_box tableH day">HR</div>';
+  v += '<div class="dayly_calendar_box tableH day"><center>' + months[month] + '-' + daysArray[tempDay.getDay()] + '-' + day + '</center></div>';
   var am = "am";
   for (var i = 0; i < 24; i++) {
     if (i == 12)
       am = "pm";
-    v += "<div class='dayly_calendar_box  day'>" + ((i % 12)) + ":00 " + am + "</div>";
-    v += "<div appointmentcount='0' day-hour-cell='" + year + "-" + month + "-" + day + "-" + (i + 1) + ":00' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + i + '","minutes":"0"}' + "'   class='clickable toggleAppointmentCard isCalWeekCell dayly_calendar_box calendar_hov day'></div>";
-    v += "<div class='dayly_calendar_box  day'>--</div>";
-    v += "<div appointmentcount='0' day-hour-cell='" + year + "-" + month + "-" + day + "-" + (i + 1) + ":30' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + i + '","minutes":"30"}' + "'   class='clickable toggleAppointmentCard isCalWeekCell dayly_calendar_box calendar_hov day'></div>"
+    v += "<div class='dayly_calendar_box tableH day'>" + ((i % 12)) + ":00 " + am + "</div>";
+    v += "<div appointmentcount='0' day-hour-cell='" + year + "-" + month + "-" + day + "-" + (i + 1) + ":00' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + i + '","minutes":"0"}' + "'   class=' "+classes+"  isCalWeekCell dayly_calendar_box day'></div>";
+    v += "<div class='dayly_calendar_box tableH day'>--</div>";
+    v += "<div appointmentcount='0' day-hour-cell='" + year + "-" + month + "-" + day + "-" + (i + 1) + ":30' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + i + '","minutes":"30"}' + "'   class='"+classes+"    isCalWeekCell dayly_calendar_box day'></div>"
   }
 
   var calendarHeader = $("<div/>").addClass("dayly_calendar_header");
@@ -254,10 +285,10 @@ function buildDaylycalendar() {
 }
 //------------------------------------------------------------------weekly calendar------------------------------------------------------------------
 //this function renders the weeklly calendar
-function buildWeekscalendar(s, e, am) {
+function buildWeekscalendar(s, e, am,isDoc) {
   var calendar = $("<div/>").addClass("");
-  var v = buildDayHours(s, e, am);
-  var w = '<div class="weekly_calendar_header">\
+  var v = buildDayHours(s, e, am,isDoc);
+  var w = '<div class="weekly_calendar_header tableH">\
   <div >Hr</div>\
   <div calss="weekSunDate" day-head-date="'+ weekDaysDates[0] + '">Sun(' + weekDaysDates[0] + ')</div>\
     <div day-head-date="'+ weekDaysDates[1] + '">Mon(' + weekDaysDates[1] + ')</div>\
@@ -272,20 +303,24 @@ function buildWeekscalendar(s, e, am) {
   return calendar;
 }
 //this function builds the hourlly blocks of the weekly calendar $s = starting time $e ending time $am timing
-function buildDayHours(s, e, am) {
+function buildDayHours(s, e, am,isDoc) {
+  var classes = "toggleAppointmentCard calendar_hov clickable ";
+  if(isDoc){
+    classes="";
+  }
   var weakdaysLetters = ["sa","su","mo","tu","we","th","fr"];
   var timePeroid = ['am', 'pm'];
   var v = "";
   for (var i = s; i < e; i++) {
     if ((i % 12) == 0)
       am = (am + 1) % 2;
-    v += "<div class='weekly_calendar_box calendar_hov day'>" + (i % 12) + ":00 " + timePeroid[am] + "</div>";
+    v += "<div class='weekly_calendar_box tableH day'>" + (i % 12) + ":00 " + timePeroid[am] + "</div>";
     for (var k = 0; k < 7; k++) {
-      v += "<div appointmentCount='0' wkDyHr='"+weakdaysLetters[k]+i+"' day-hour-cell='" + weekDaysDates[k] + "-" + i + ":00' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + (i + 1) + '","minutes":"0"}' + "'  class='toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day'></div>";
+      v += "<div appointmentCount='0' wkDyHr='"+weakdaysLetters[k]+i+"' day-hour-cell='" + weekDaysDates[k] + "-" + i + ":00' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + (i + 1) + '","minutes":"0"}' + "'  class=' "+classes+" isCalWeekCell weekly_calendar_box  day'></div>";
     }
-    v += "<div  class='weekly_calendar_box calendar_hov day'>--</div>";
+    v += "<div  class='weekly_calendar_box tableH day'>" + (i % 12) + ":00 " + timePeroid[am] + "</div>";
     for (var j = 0; j < 7; j++) {
-      v += "<div appointmentCount='0' wkDyHr='"+weakdaysLetters[k]+i+"' day-hour-cell='" + weekDaysDates[k] + "-" + i + ":30' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + (i + 1) + '","minutes":"30"}' + "'  class='toggleAppointmentCard clickable isCalWeekCell weekly_calendar_box calendar_hov day'></div>";
+      v += "<div appointmentCount='0' wkDyHr='"+weakdaysLetters[k]+i+"' day-hour-cell='" + weekDaysDates[k] + "-" + i + ":30' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + i + '","minutes":"30"}' + "'  class=' "+classes+" isCalWeekCell weekly_calendar_box  day'></div>";
     }
   }
   return v;
@@ -342,6 +377,7 @@ function changeDay(chng) {
 }
 //this function change the calendar based on the action spicisfied
 function changeWeekCal(chng) {
+
   if (chng == "nxt") {
     //calculate the start of the week
     for (var i = 0; i < 7; i++) {
@@ -360,7 +396,6 @@ function changeWeekCal(chng) {
       weekDaysDates[i] = year + "-" + month + "-" + day;
     }
   }
-  console.log("weekDaysDates");
 }
 //this function return the number of days in the giving month and year
 function daysInThisMonth(year, month) {
@@ -520,7 +555,7 @@ function doctorOption() {
   return res;
 }
 function specOptions() {
-  return '<option value="" >' + lns.getText("n60") + '</option><option value="dermatology (skin)">Dermatology (Skin)</option> <option value="dentistry (teeth)">Dentistry (Teeth)</option> <option value="psychiatry">Psychiatry</option> <option value="pediatrics">Pediatrics</option> <option value="neurology">Neurology</option> <option value="orthopedics">Orthopedics</option> <option value="gynecology and infertility">Gynecology and Infertility</option> <option value="ear">Ear</option> <option value="nose and throat">Nose and Throat</option> <option value="cardiology and vascular ">Cardiology and Vascular </option> <option value="allergy">Allergy</option> <option value="androgyny">Androgyny</option> <option value="audiology">Audiology</option> <option value="cardiology">Cardiology</option> <option value="chest and respiratory">Chest and Respiratory</option> <option value="diabetes and rndocrinology">Diabetes and Endocrinology</option> <option value="diagnostic ">Diagnostic </option> <option value="radiology">Radiology</option> <option value="dietitian and nutrition">Dietitian and Nutrition</option> <option value="elders">Elders</option>';
+  return '<option value="" >' + lns.getText("n60") + '</option><option value="dermatology">Dermatology (Skin)</option> <option value="dentistry">Dentistry (Teeth)</option> <option value="psychiatry">Psychiatry</option> <option value="pediatrics">Pediatrics</option> <option value="neurology">Neurology</option> <option value="orthopedics">Orthopedics</option> <option value="gynecology">Gynecology and Infertility</option> <option value="ear">Ear</option> <option value="throat">Nose and Throat</option> <option value="cardiology">Cardiology and Vascular </option> <option value="allergy">Allergy</option> <option value="androgyny">Androgyny</option> <option value="audiology">Audiology</option> <option value="cardiology">Cardiology</option> <option value="chest">Chest and Respiratory</option> <option value="diabetes">Diabetes and Endocrinology</option> <option value="diagnostic">Diagnostic </option> <option value="radiology">Radiology</option> <option value="dietitian">Dietitian and Nutrition</option> <option value="elders">Elders</option>';
 }
 function renderApp() {
   var cid = $(".slcted").attr("cid");
@@ -545,26 +580,60 @@ function calTran() {
   var cid = localStorage.getItem("slctdCalView");
   if (!cid || cid == "")
     cid = $(".slcted").attr("cid");
+  
+  var isDoc = isDocc();
+  
 
   $("#calnderDate").text(year + ',' + months[month]);
   if (cid == "month") {
     $(".calendar").html(buildMonthlycalendar());
   }
   else if (cid == "week") {
-    buildWeeksCalHelper();
-    $(".calendar").html(buildWeekscalendar(0, 24, 0));
+    $(".calendar").html(buildWeekscalendar(0, 24, 0,isDoc));
   }
   else {
-    $(".calendar").html(buildDaylycalendar());
+    $(".calendar").html(buildDaylycalendar(isDoc));
   }
-
+  $(".calPrev").attr("acid",cid);
+  $(".calNext").attr("acid",cid);
   renderApp();
 }
 function rendDocAvaTime(sec){
-  sec = sec.split(" ");
+  if(!sec||sec=="")
+    return;
 
+    console.log(sec);
+
+  sec = sec.split(" ");
   for(var a in sec){
     var wkDyHr = sec[a]; 
-    $(".isCalWeekCell[wkDyHr='"+wkDyHr+"']").css("background-color","#bbdefb");
+    var element = $(".isCalWeekCell[wkDyHr='"+wkDyHr+"']");
+    element.addClass("calendar_hov");
+    element.addClass("clickable");
+    element.addClass("toggleAppointmentCard");
+    element.css("background-color","White");
   }
+}
+function blockAllCells(){
+  $(".isCalWeekCell").each(function(){
+    $(this).removeClass("calendar_hov");
+    $(this).removeClass("clickable");
+    $(this).removeClass("toggleAppointmentCard");
+    $(this).css("background-color","#cfd8dc");
+  });
+}
+function clearAllCells(){
+  $(".isCalWeekCell").each(function(){
+    $(this).addClass("calendar_hov");
+    $(this).addClass("clickable");
+    $(this).addClass("toggleAppointmentCard");
+    $(this).css("background-color","White");
+  });
+}
+function isDocc(){
+  var isDoc = false;
+  var user = localStorage.getItem('user');
+  var user = JSON.parse(user);
+  if(user.role==4){isDoc=true}
+  return isDoc;
 }
