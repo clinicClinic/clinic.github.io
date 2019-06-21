@@ -2,7 +2,10 @@
 {
     cursor: pointer;
 }
-
+.lableUnderLine{
+  border-left: #448aff solid 2px;
+  
+}
 .appointment-week-boxs{
   display: inline-block;
   width:auto;

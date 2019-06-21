@@ -1732,14 +1732,14 @@ function buildAppointmentCard(appointment) {
   var br = $("<br/>");
   var cardBody = $("<div/>").addClass("card-body");
   cardBody.append(br.clone());
-  cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n39') + '</label><label class="col-sm-2 col-form-label mdl-color-text--teal-500">' + appointment.doctor.fname + ',' + appointment.doctor.lname + '</label>\
-                                    <label class="col-sm-2 col-form-label">' + lns.getText('n40') + '</label><label class="col-sm-2 col-form-label mdl-color-text--teal-500">' + appointment.patient.fname + ',' + appointment.patient.lname + '</label>\
-                                    <label class="col-sm-2 col-form-label">' + lns.getText('n28') + '</label><label class="col-sm-2 col-form-label mdl-color-text--teal-500">' + time + '</label>\
+  cardBody.append('<div class="row"><label class="col-sm-2 lableUnderLine col-form-label">' + lns.getText('n39') + '</label><label class="col-sm-2 lableUnderLine col-form-label mdl-color-text--teal-500">' + appointment.doctor.fname + ',' + appointment.doctor.lname + '</label>\
+                                    <label class="col-sm-2 lableUnderLine col-form-label">' + lns.getText('n40') + '</label><label class="col-sm-2 lableUnderLine col-form-label mdl-color-text--teal-500">' + appointment.patient.fname + ',' + appointment.patient.lname + '</label>\
+                                    <label class="col-sm-2 lableUnderLine col-form-label">' + lns.getText('n28') + '</label><label class="col-sm-2 lableUnderLine col-form-label mdl-color-text--teal-500">' + time + '</label>\
                     </div>');
   cardBody.append(br.clone());
-  cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n26') + '</label><label class="col-sm-2 col-form-label mdl-color-text--teal-500">' + date + '</label>\
-                                  <label class="col-sm-2 col-form-label">' + lns.getText('n20') + '</label><label class="col-sm-2 col-form-label mdl-color-text--teal-500">' + appointment.specialty + ' </label>\
-                                  <label class="col-sm-2 col-form-label">' + lns.getText('n49') + '</label><label class="col-sm-2 col-form-label mdl-color-text--teal-500">' + appointment.user.fname + ',' + appointment.user.lname + '</label>\
+  cardBody.append('<div class="row"><label class="col-sm-2 lableUnderLine col-form-label">' + lns.getText('n26') + '</label><label class="col-sm-2 lableUnderLine col-form-label mdl-color-text--teal-500">' + date + '</label>\
+                                  <label class="col-sm-2 lableUnderLine col-form-label">' + lns.getText('n20') + '</label><label class="col-sm-2 lableUnderLine col-form-label mdl-color-text--teal-500">' + appointment.specialty + ' </label>\
+                                  <label class="col-sm-2 lableUnderLine -form-label">' + lns.getText('n49') + '</label><label class="col-sm-2 lableUnderLine col-form-label mdl-color-text--teal-500">' + appointment.user.fname + ',' + appointment.user.lname + '</label>\
                   </div>');
   cardBody.append(br.clone());
   cardBody.append(appointmentStatusBtns(appointment.id, appointment.stat));
