@@ -74,14 +74,17 @@ app.post('/login', function (req, res) {
 // });
 app.post('/mobile/login', function (req, res) {
   //get the user  hash 
-  checkUserCred(req.body.email, req.body.password, function (valid, cuser) {
+  checkPatientCred(req.body.email, req.body.password, function (valid, cuser) {
     if (valid) {
       //create token
       jwt.sign({ user: req.body }, "privateKey", { expiresIn: "1h" }, function (err, token) {
         res.send('{"token":"' + token + '","user":' + cuser + '}');
       });
     }
-    else {
+    else if(!valid && cuser=='{"error":"user is created by a clinic"}') {
+      res.send('{"error":"user is created by a clinic"}');
+    }
+    else{
       res.send('invalid user or password');
     }
   });
@@ -369,6 +372,32 @@ function checkUserCred(email, pass, callback) {
         callback(false, '');
       }
     });
+  });
+}
+function checkPatientCred(email, pass, callback) {
+  var sql = 'SELECT * FROM patients_j45bsc WHERE email = ? ';
+  pool.query(sql, [email], function (error, results) {
+    if (error) throw error;
+    if (!results[0]) {
+      callback(false, '');
+      return;
+    }
+    //Load hash from your password DB.
+    var hash = results[0].password;
+    if(hash==""||hash==null){
+      callback(false,'{"error":"user is created by a clinic"}');
+    }else{
+      bcrypt.compare(pass, hash, function (err, res) {
+        // res == true
+        if (res == true) {
+          results[0].password = '';
+          callback(true, JSON.stringify(results[0]));
+        }
+        else {
+          callback(false, '');
+        }
+      });
+    }
   });
 }
 function verifyToken(req, res, next) {
