@@ -1,3 +1,4 @@
  -socket io loopback
  - ..   .. edit appointment
- -usrr logs
+- one method to get all login information
+-clinic logs and emit

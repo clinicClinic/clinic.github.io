@@ -432,7 +432,7 @@ export function socketInit() {
 }
 
 function buildLog() {
-    $("#notifications").append("");
+    $("#notifications").html("");
     var logs = obj.getLogs();
     if (logs) {
       for (var a in logs) {
