@@ -1,6 +1,11 @@
 import * as appo from './appCalender.js';
-var socket = io();
-socketInit();
+import * as obj from './obj.js';
+
+var audio = new Audio('sounds/notification.mp3');
+audio.volume = 0.6;
+// var socket = io();
+// socketInit();
+
 $(document).ajaxStart(function() {
     // show loader on start
     $('#loadingIcon').show();
@@ -73,6 +78,27 @@ export function getClinicPatients(callback) {
         beforeSend: function (request) {
             request.setRequestHeader('authorization', bearerToken);
         },
+        contentType: 'application/json',
+        success: function (result) {
+            callback(result);
+        },
+        error: function (data) {
+            localStorage.localStorage.setItem('token', '');
+            location.reload();
+        }
+    });
+}
+export function getDocLogs(callback) {
+    var bearerToken = 'bearer ' + localStorage.getItem('token');
+    var user = localStorage.getItem('user');
+    var user = '{"user":' + user + '}';
+    $.ajax({
+        url: "/clinic/getDocLogs",
+        type: "POST",
+        beforeSend: function (request) {
+            request.setRequestHeader('authorization', bearerToken);
+        },
+        data:user,
         contentType: 'application/json',
         success: function (result) {
             callback(result);
@@ -253,6 +279,28 @@ export function deleteUser(data, callback) {
         }
     });
 }
+export function removeLog(data, callback) {
+    data = '{"lid":"'+data+'"}';
+    var bearerToken = 'bearer ' + localStorage.getItem('token');
+    $.ajax({
+        url: "/clinic/removeLog",
+        type: "POST",
+        beforeSend: function (request) {
+            request.setRequestHeader('authorization', bearerToken);
+        },
+        data: data,
+        contentType: 'application/json',
+        success: function (result) {
+            callback();
+        },
+        statusCode: {
+            403: function () {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+    });
+}
 export function editAppointment(data, callback) {
     var bearerToken = 'bearer ' + localStorage.getItem('token');
     $.ajax({
@@ -293,15 +341,6 @@ export function changeAppointmentStat(data, callback) {
                 location.reload();
             }
         }
-    });
-}
-export function socketInit() {
-    //socket = io();
-    socket.on('appointment added', function (msg) {
-        getAppointments(function (appointments) {
-            localStorage.setItem("appointments", JSON.stringify(appointments));
-            alert('appointment added');
-        });
     });
 }
 export function integratePatient(data, callback) {
@@ -366,4 +405,51 @@ export function updateAppointmentDrugs(data,callback){
             }
         }
     });
+}
+//------------------------------------------------------ socket io listeners
+export function socketInit() {
+    var token =  localStorage.getItem('token');
+    var socket = io({query: {token: token}});
+    socket.on('appointment added', function (msg) {
+        getAppointments(function (appointments) {
+            localStorage.setItem("appointments", JSON.stringify(appointments));
+            getDocLogs(function(logs){
+                buildLog();
+
+            });
+        });
+    });
+    socket.on('state changed', function (msg) {
+        getDocAppointments(function (appointments) {
+            localStorage.setItem("appointments", JSON.stringify(appointments));
+            getDocLogs(function(logs){
+            localStorage.setItem("logs", JSON.stringify(logs));
+            buildLog();    
+            audio.play();            
+            });
+        });
+    });
+}
+
+function buildLog() {
+    $("#notifications").append("");
+    var logs = obj.getLogs();
+    if (logs) {
+      for (var a in logs) {
+        $("#notifications").append(addNotifications(logs[a]));
+      }
+    }
+  }
+function addNotifications(log) {
+return '<a class="dropdown-item d-flex align-items-center" >\
+            <div class="mr-3">\
+            <div class="icon-circle bg-primary">\
+                <i class="fas fa-file-alt text-white"></i>\
+            </div>\
+            </div>\
+            <div>\
+            <div class="row"><div class="col-md-10"><div class="small text-gray-500">Today:just now</div></div><div class="col-md-2"><lable lid="'+log.id+'"class="removeLog clickable pull-right">X</lable></div></div>\
+            <span class="font-weight-bold">'+ log.cont + '</span>\
+            </div>\
+        </a>';
 }

@@ -1,3 +1,3 @@
- -suspend all socket functionality til later milestone.]
- -remove all appoinment methods
- -
+ -socket io loopback
+ - ..   .. edit appointment
+ -usrr logs

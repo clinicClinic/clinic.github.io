@@ -55,7 +55,6 @@ $(document).on("click", ".calPrev", function () {
 
 });
 
-
 $(document).on("click", ".weeksBtn", function () {
   //update the week header dates
   $(".slcted").attr("cid", "week");

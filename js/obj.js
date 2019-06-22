@@ -90,3 +90,8 @@ export function getAppointment(id){
         }
     }
 }
+export function getLogs(){
+    var logs = localStorage.getItem('logs');
+    logs = JSON.parse(logs);
+    return logs;
+} 
