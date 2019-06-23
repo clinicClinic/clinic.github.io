@@ -86,7 +86,7 @@ app.post('/mobile/login', function (req, res) {
       res.send('{"error":"user is created by a clinic"}');
     }
     else{
-      res.send('invalid user or password');
+      res.send('{"invalid":"invalid user or email"}');
     }
   });
 });
