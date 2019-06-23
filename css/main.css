@@ -39,7 +39,9 @@
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
 }
-
+.timeNode{
+  font-size: 11px;
+}
 /*appointment monthly calender style*/
   .monthly_calendar_body,
   .monthly_calendar_header {

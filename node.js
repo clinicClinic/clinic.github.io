@@ -91,8 +91,28 @@ app.post('/mobile/getCityClinics', verifyToken, function (req, res) {
     }
   });
 });
+app.post('/mobile/getClinicDocs', verifyToken, function (req, res) {
+  jwt.verify(req.token, 'privateKey', function (err, authData) {
+    if (err) {
+      res.sendStatus(403);
+    }
+    else {
+      getClinicDocs(req.body[0].id, function (result) {
+        console.log("sending" + result);
+        res.send(result);
+      });
+    }
+  });
+});
 function getCityClinics(city, callback) {
   var sql = 'SELECT * FROM clinics WHERE city = ?';
+  pool.query(sql, [city], function (error, results) {
+    if (error) throw error;
+    callback(results);
+  });
+}
+function getClinicDocs(id, callback) {
+  sql = 'SELECT doctors_12fdrv.id,user_id,fname,lname,nationality,specialty,gender,address,sec,birth_date,phone FROM doctors_12fdrv inner join users_2er31 on doctors_12fdrv.user_id = users_2er31.id where clinic_id=? and role=4';
   pool.query(sql, [city], function (error, results) {
     if (error) throw error;
     callback(results);

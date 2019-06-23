@@ -1438,7 +1438,13 @@ function timeSec(did) {
   for (var i = 0; i < 23; i++) {
     res += '<div class="row border-left border-top border-bottom">';
     for (var j = 0; j < 7; j++) {
-      res += '<div slctd="false" timeSec="' + daysL[j] + '' + i + ' " class="noselect timeNode col border-right border-grey">' + i + ':00</div>';
+      res += '<div slctd="false" timeSec="' + daysL[j] + '' + i + ':00 " class="noselect timeNode col border-right border-grey">' + i + ':00</div>';
+    }
+    res += '</div>';
+    res += '<div class="row border-left border-top border-bottom">';
+
+    for (var j = 0; j < 7; j++) {
+      res += '<div slctd="false" timeSec="' + daysL[j] + '' + i + ':30 " class="noselect timeNode col border-right border-grey">' + i + ':30</div>';
     }
     res += '</div>';
   }
