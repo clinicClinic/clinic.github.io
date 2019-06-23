@@ -40,7 +40,7 @@ io.sockets.use(function (socket, next) {
   var tempToken = socket.handshake.query.token.split("  ");
   var user = tempToken[1];
   user = JSON.parse(user);
-  connections[user.id]= {user:user,socket:socket};
+  connections[user.id] = { user: user, socket: socket };
   userCount++;
   //connecting
   console.log('user connected :%s', userCount);
@@ -70,28 +70,28 @@ app.post('/mobile/login', function (req, res) {
         res.send('{"token":"' + token + '","user":' + cuser + '}');
       });
     }
-    else if(!valid && cuser=='{"error":"user is created by a clinic"}') {
+    else if (!valid && cuser == '{"error":"user is created by a clinic"}') {
       res.send('{"error":"user is created by a clinic"}');
     }
-    else{
+    else {
       res.send('{"invalid":"invalid user or email"}');
     }
   });
 });
-app.post('/mobile/getCityClinics',verifyToken, function (req, res) {
+app.post('/mobile/getCityClinics', verifyToken, function (req, res) {
   jwt.verify(req.token, 'privateKey', function (err, authData) {
     if (err) {
       res.sendStatus(403);
     }
     else {
-      console.log("this ball shit "+JSON.stringify(req.body[0]));
       getCityClinics(req.body[0].city, function (result) {
+        console.log("sending" + result);
         res.send(result);
       });
     }
   });
 });
-function getCityClinics(city,callback){
+function getCityClinics(city, callback) {
   var sql = 'SELECT * FROM clinics WHERE city = ?';
   pool.query(sql, [city], function (error, results) {
     if (error) throw error;
@@ -105,7 +105,7 @@ app.post('/login', function (req, res) {
     if (valid) {
       //create token
       // jwt.sign({ user: req.body }, "privateKey", { expiresIn: "1h" }, function (err, token) {
-        jwt.sign({ user: req.body }, "privateKey", function (err, token) {
+      jwt.sign({ user: req.body }, "privateKey", function (err, token) {
         res.send(token + '  ' + cuser);
       });
     }
@@ -247,7 +247,7 @@ app.post('/clinic/addAppointment', verifyToken, function (req, res) {
     }
     else {
       // console.log(req.body.appointment);
-     
+
       insertAppointment(req.body.user, req.body.appointment, function (result) {
         res.send(result);
         emitAppointmentAdded(req.body.user.clinic_id);
@@ -410,9 +410,9 @@ function checkPatientCred(email, pass, callback) {
     }
     //Load hash from your password DB.
     var hash = results[0].password;
-    if(hash==""||hash==null){
-      callback(false,'{"error":"user is created by a clinic"}');
-    }else{
+    if (hash == "" || hash == null) {
+      callback(false, '{"error":"user is created by a clinic"}');
+    } else {
       bcrypt.compare(pass, hash, function (err, res) {
         // res == true
         if (res == true) {
@@ -538,7 +538,7 @@ function changeAppointmentStat(id, stat, callback) {
   var sql = 'UPDATE appointments_3sd3df Set stat=? WHERE id=?';
   pool.query(sql, [stat, id], function (error, results) {
     if (error) throw error;
-    emitStat(id,stat);
+    emitStat(id, stat);
     callback("Edited Successfully");
   });
 }
@@ -677,13 +677,13 @@ function getDocLogs(user, callback) {
     }
   });
 }
-function insertLog(userId,log) {
+function insertLog(userId, log) {
   sql = ' INSERT INTO logs_45fgre(user_id, cont) VALUES(?,?)';
-  pool.query(sql, [userId,log], function (error, res) {
+  pool.query(sql, [userId, log], function (error, res) {
     if (error) throw error;
   });
 }
-function removeLog(lid,callback) {
+function removeLog(lid, callback) {
   sql = ' DELETE FROM  logs_45fgre WHERE id = ?';
   pool.query(sql, [lid], function (error, res) {
     if (error) throw error;
@@ -691,38 +691,38 @@ function removeLog(lid,callback) {
   });
 }
 
-function emitAppointmentAdded(id){
-// emit msg that appointment addedd to all user with $clinic_id == $id
-for(var a in connections){
-  var clinic_id =  connections[a].user.clinic_id;
-  var role = connections[a].user.role;
-  if(clinic_id==id && role<=3){
-    var currSocket = connections[a].socket;
-    currSocket.emit("appointment added", "");
+function emitAppointmentAdded(id) {
+  // emit msg that appointment addedd to all user with $clinic_id == $id
+  for (var a in connections) {
+    var clinic_id = connections[a].user.clinic_id;
+    var role = connections[a].user.role;
+    if (clinic_id == id && role <= 3) {
+      var currSocket = connections[a].socket;
+      currSocket.emit("appointment added", "");
+    }
   }
-}
 
 }
-function emitToDoc(id){
+function emitToDoc(id) {
   var sql = 'SELECT * FROM  doctors_12fdrv WHERE id =?';
   pool.query(sql, [id], function (error, results) {
     if (error) throw error;
     var userId = results[0].user_id;
-    if(connections[userId]){
+    if (connections[userId]) {
       var currSocket = connections[userId].socket;
-      insertLog(userId,"appointment added");
+      insertLog(userId, "appointment added");
       currSocket.emit("appointment added", "");
     }
   });
 }
-function emitStat(id,stat){
+function emitStat(id, stat) {
   //alert doctor of appointment state
   var sql = 'SELECT user_id, date FROM  appointments_3sd3df INNER JOIN  doctors_12fdrv ON appointments_3sd3df.doctor_id = doctors_12fdrv.id WHERE appointments_3sd3df.id=?';
   pool.query(sql, [id], function (error, results) {
     if (error) throw error;
     var userId = results[0].user_id;
-    insertLog(userId,"appointment on" + results[0].date + "changed to" + stat);
-    if(connections[userId]){
+    insertLog(userId, "appointment on" + results[0].date + "changed to" + stat);
+    if (connections[userId]) {
       var currSocket = connections[userId].socket;
       currSocket.emit("state changed", "appointment on " + results[0].date + " changed to " + stat);
     }
