@@ -113,7 +113,7 @@ function getCityClinics(city, callback) {
 }
 function getClinicDocs(id, callback) {
   sql = 'SELECT doctors_12fdrv.id,user_id,fname,lname,nationality,specialty,gender,address,sec,birth_date,phone FROM doctors_12fdrv inner join users_2er31 on doctors_12fdrv.user_id = users_2er31.id where clinic_id=? and role=4';
-  pool.query(sql, [city], function (error, results) {
+  pool.query(sql, [id], function (error, results) {
     if (error) throw error;
     callback(results);
   });
