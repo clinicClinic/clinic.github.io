@@ -84,7 +84,7 @@ app.post('/mobile/getCityClinics',verifyToken, function (req, res) {
       res.sendStatus(403);
     }
     else {
-      console.log("this ball shit "+req.body);
+      console.log("this ball shit "+JSON.stringify(req.body));
       // getCityClinics(req.body.city, function (result) {
       //   res.send('{"result":'+result+'}');
       // });
