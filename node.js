@@ -84,10 +84,10 @@ app.post('/mobile/getCityClinics',verifyToken, function (req, res) {
       res.sendStatus(403);
     }
     else {
-      console.log("this ball shit "+JSON.stringify(req.body));
-      // getCityClinics(req.body.city, function (result) {
-      //   res.send('{"result":'+result+'}');
-      // });
+      console.log("this ball shit "+JSON.stringify(req.body[0]));
+      getCityClinics(req.body[0].city, function (result) {
+        res.send('{"result":'+result+'}');
+      });
     }
   });
 });
