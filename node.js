@@ -72,6 +72,7 @@ app.post('/login', function (req, res) {
 // app.post('/test', function (req, res) {
 //   io.emit("appointment added", "");
 // });
+// app.use('/mobile/login', require("./api/mobile.js"));
 app.post('/mobile/login', function (req, res) {
   //get the user  hash 
   checkPatientCred(req.body.email, req.body.password, function (valid, cuser) {
