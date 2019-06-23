@@ -55,30 +55,18 @@ http.listen(PORT, function () {
   console.log('listening on *:3000');
 });
 
-app.post('/login', function (req, res) {
-  //get the user  hash 
-  checkUserCred(req.body.email, req.body.password, function (valid, cuser) {
-    if (valid) {
-      //create token
-      jwt.sign({ user: req.body }, "privateKey", { expiresIn: "1h" }, function (err, token) {
-        res.send(token + '  ' + cuser);
-      });
-    }
-    else {
-      res.send('invalid user or password');
-    }
-  });
-});
 // app.post('/test', function (req, res) {
 //   io.emit("appointment added", "");
 // });
 // app.use('/mobile/login', require("./api/mobile.js"));
+///--------------------------------------------------------------------------mobile api-----------------------------------------------------------------
 app.post('/mobile/login', function (req, res) {
   //get the user  hash 
   checkPatientCred(req.body.email, req.body.password, function (valid, cuser) {
     if (valid) {
       //create token
       jwt.sign({ user: req.body }, "privateKey", { expiresIn: "1h" }, function (err, token) {
+        console.log(req.body);
         res.send('{"token":"' + token + '","user":' + cuser + '}');
       });
     }
@@ -87,6 +75,41 @@ app.post('/mobile/login', function (req, res) {
     }
     else{
       res.send('{"invalid":"invalid user or email"}');
+    }
+  });
+});
+app.post('/mobile/getCityClinics',verifyToken, function (req, res) {
+  jwt.verify(req.token, 'privateKey', function (err, authData) {
+    if (err) {
+      res.sendStatus(403);
+    }
+    else {
+      getCityClinics(req.body.city, function (result) {
+        res.send(result);
+      });
+    }
+  });
+});
+function getCityClinics(city,callback){
+  var sql = 'SELECT * FROM clinics WHERE city = ?';
+  pool.query(sql, [city], function (error, results) {
+    if (error) throw error;
+    callback(results);
+  });
+}
+///--------------------------------------------------------------------------clinic api---------------------------------------------------------------
+app.post('/login', function (req, res) {
+  //get the user  hash 
+  checkUserCred(req.body.email, req.body.password, function (valid, cuser) {
+    if (valid) {
+      //create token
+      // jwt.sign({ user: req.body }, "privateKey", { expiresIn: "1h" }, function (err, token) {
+        jwt.sign({ user: req.body }, "privateKey", function (err, token) {
+        res.send(token + '  ' + cuser);
+      });
+    }
+    else {
+      res.send('invalid user or password');
     }
   });
 });
@@ -376,6 +399,7 @@ function checkUserCred(email, pass, callback) {
   });
 }
 function checkPatientCred(email, pass, callback) {
+
   var sql = 'SELECT * FROM patients_j45bsc WHERE email = ? ';
   pool.query(sql, [email], function (error, results) {
     if (error) throw error;
