@@ -104,6 +104,19 @@ app.post('/mobile/getClinicDocs', verifyToken, function (req, res) {
     }
   });
 });
+app.post('/mobile/addAppointment', verifyToken, function (req, res) {
+  jwt.verify(req.token, 'privateKey', function (err, authData) {
+    if (err) {
+      res.sendStatus(403);
+    }
+    else {
+      // console.log(req.body.appointment);
+      addAppointment(req.body.appointment, function (result) {
+        res.send(result);
+      });
+    }
+  });
+});
 function getCityClinics(city, callback) {
   var sql = 'SELECT * FROM clinics WHERE city = ?';
   pool.query(sql, [city], function (error, results) {
@@ -112,8 +125,15 @@ function getCityClinics(city, callback) {
   });
 }
 function getClinicDocs(id, callback) {
-  sql = 'SELECT doctors_12fdrv.id,user_id,fname,lname,nationality,specialty,gender,address,sec,birth_date,phone FROM doctors_12fdrv inner join users_2er31 on doctors_12fdrv.user_id = users_2er31.id where clinic_id=? and role=4';
+  sql = 'SELECT doctors_12fdrv.id,user_id,fname,lname,nationality,specialty,gender,address,sec,birth_date,phone,clinic_id FROM doctors_12fdrv inner join users_2er31 on doctors_12fdrv.user_id = users_2er31.id where clinic_id=? and role=4';
   pool.query(sql, [id], function (error, results) {
+    if (error) throw error;
+    callback(results);
+  });
+}
+function addAppointment(appointment, callback) {
+  sql = 'INSERT INTO appointments_3sd3df (doctor_id, clinic_id, patient_id, specialty, date, isBy) VALUES (?,?,?,?,?,?)';
+  pool.query(sql, [appointment.doctor_id, appointment.clinic_id, appointment.patient_id, appointment.specialty, appointment.date, 1], function (error, results) {
     if (error) throw error;
     callback(results);
   });

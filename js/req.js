@@ -13,6 +13,28 @@ $(document).ajaxStart(function() {
     // hide loader on success
     $('#loadingIcon').hide();
 });
+// mobileTest();
+// function mobileTest(){
+//     var bearerToken = 'bearer ' + localStorage.getItem('token');
+//     $.ajax({
+//         url: "/mobile/addAppointment",
+//         type: "POST",
+//         beforeSend: function (request) {
+//             request.setRequestHeader('authorization', bearerToken);
+//         },
+//         data: '{"appointment":{"specialty":"dentistry","doctor_id":"3","patient_id":"41","date":"2019-5-24 2:00"}}',
+//         contentType: 'application/json',
+//         success: function (result) {
+//             callback(result);
+//         },
+//         statusCode: {
+//             403: function () {
+//                 localStorage.clear();
+//                 location.reload();
+//             }
+//         }
+//     });
+// }
 export function login(data, callback) {
     $.ajax({
         url: "/login",

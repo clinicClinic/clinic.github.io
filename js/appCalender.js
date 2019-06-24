@@ -269,9 +269,9 @@ function buildDaylycalendar(isDoc) {
     if (i == 12)
       am = "pm";
     v += "<div class='dayly_calendar_box tableH day'>" + ((i % 12)) + ":00 " + am + "</div>";
-    v += "<div appointmentcount='0' wkDyHr='"+weakdaysLetters[tempDay.getDay()]+i+":00' day-hour-cell='" + year + "-" + month + "-" + day + "-" + (i + 1) + ":00' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + i + '","minutes":"0"}' + "'   class=' "+classes+"  isCalWeekCell dayly_calendar_box day'></div>";
+    v += "<div appointmentcount='0' wkDyHr='"+weakdaysLetters[tempDay.getDay()]+","+i+":00' day-hour-cell='" + year + "-" + month + "-" + day + "-" + (i + 1) + ":00' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + i + '","minutes":"0"}' + "'   class=' "+classes+"  isCalWeekCell dayly_calendar_box day'></div>";
     v += "<div class='dayly_calendar_box tableH day'>--</div>";
-    v += "<div appointmentcount='0' wkDyHr='"+weakdaysLetters[tempDay.getDay()]+i+":30' day-hour-cell='" + year + "-" + month + "-" + day + "-" + (i + 1) + ":30' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + i + '","minutes":"30"}' + "'   class='"+classes+"    isCalWeekCell dayly_calendar_box day'></div>"
+    v += "<div appointmentcount='0' wkDyHr='"+weakdaysLetters[tempDay.getDay()]+","+i+":30' day-hour-cell='" + year + "-" + month + "-" + day + "-" + (i + 1) + ":30' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + i + '","minutes":"30"}' + "'   class='"+classes+"    isCalWeekCell dayly_calendar_box day'></div>"
   }
 
   var calendarHeader = $("<div/>").addClass("dayly_calendar_header");
@@ -316,11 +316,11 @@ function buildDayHours(s, e, am,isDoc) {
       am = (am + 1) % 2;
     v += "<div class='weekly_calendar_box tableH day'>" + (i % 12) + ":00 " + timePeroid[am] + "</div>";
     for (var k = 0; k < 7; k++) {
-      v += "<div appointmentCount='0' wkDyHr='"+weakdaysLetters[k]+i+":00' day-hour-cell='" + weekDaysDates[k] + "-" + i + ":00' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + (i + 1) + '","minutes":"0"}' + "'  class=' "+classes+" isCalWeekCell weekly_calendar_box  day'></div>";
+      v += "<div appointmentCount='0' wkDyHr='"+weakdaysLetters[k]+","+i+":00' day-hour-cell='" + weekDaysDates[k] + "-" + i + ":00' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + (i + 1) + '","minutes":"0"}' + "'  class=' "+classes+" isCalWeekCell weekly_calendar_box  day'></div>";
     }
     v += "<div  class='weekly_calendar_box tableH day'>" + (i % 12) + ":30 " + timePeroid[am] + "</div>";
     for (var j = 0; j < 7; j++) {
-      v += "<div appointmentCount='0' wkDyHr='"+weakdaysLetters[j]+i+":30' day-hour-cell='" + weekDaysDates[j] + "-" + i + ":30' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + i + '","minutes":"30"}' + "'  class=' "+classes+" isCalWeekCell weekly_calendar_box  day'></div>";
+      v += "<div appointmentCount='0' wkDyHr='"+weakdaysLetters[j]+","+i+":30' day-hour-cell='" + weekDaysDates[j] + "-" + i + ":30' app-data='" + '{"year":"' + year + '","month":"' + month + '","day":"' + day + '","hour":"' + i + '","minutes":"30"}' + "'  class=' "+classes+" isCalWeekCell weekly_calendar_box  day'></div>";
     }
   }
   return v;
