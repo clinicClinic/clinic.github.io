@@ -110,7 +110,6 @@ app.post('/mobile/addAppointment', verifyToken, function (req, res) {
       res.sendStatus(403);
     }
     else {
-      // console.log(req.body.appointment);
       addAppointment(req.body.appointment, function (result) {
         res.send(result);
       });
