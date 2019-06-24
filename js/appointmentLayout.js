@@ -288,9 +288,11 @@ function buildAppointmentCard(appointment) {
                                       <label class="col-sm-2 col-form-label">' + lns.getText('n28') + '</label><label class="col-sm-2 col-form-label mdl-color-text--teal-500">' + time + '</label>\
                       </div>');
   cardBody.append(br.clone());
+  var byUserName =  "";
+  (appointment.user) ? byUserName = appointment.user.fname + ',' + appointment.user.lname : byUserName = "Booked by the application" ;
   cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText('n26') + '</label><label class="col-sm-2 col-form-label mdl-color-text--teal-500">' + date + '</label>\
                                     <label class="col-sm-2 col-form-label">' + lns.getText('n20') + '</label><label class="col-sm-2 col-form-label mdl-color-text--teal-500">' + appointment.specialty + ' </label>\
-                                    <label class="col-sm-2 col-form-label">' + lns.getText('n49') + '</label><label class="col-sm-2 col-form-label mdl-color-text--teal-500">' + appointment.user.fname + ',' + appointment.user.lname + '</label>\
+                                    <label class="col-sm-2 col-form-label">' + lns.getText('n49') + '</label><label class="col-sm-2 col-form-label mdl-color-text--teal-500">' + byUserName + '</label>\
                     </div>');
   cardBody.append(br.clone());
   cardBody.append(appointmentStatusBtns(appointment.id, appointment.stat));
@@ -302,8 +304,11 @@ function buildAppointmentCard(appointment) {
     cardBody.append('<div class="row"><label class="col-sm-2 col-form-label">' + lns.getText("n72") + '</label><button  style="display:none" class="addMoreDrug btn btn-info">' + lns.getText('n70') + '</button><button aid="' + appointment.id + '" style="display:none" class=" addDrugBtn btn btn-info">' + lns.getText('n58') + '</button><button class="editDrugsBtn btn btn-info">' + lns.getText('n30') + '</button></div>');
 
   } else {
-    cardBody.append(br.clone());
-    cardBody.append('<div class="row"><label class="col-sm-2 col-form-label"></label><button aid="' + appointment.id + '" class="edtAppointmentShow btn btn-warning">' + lns.getText('n30') + '</button></div>');
+    if(appointment.isBy==0){
+      cardBody.append(br.clone());
+      cardBody.append('<div class="row"><label class="col-sm-2 col-form-label"></label><button aid="' + appointment.id + '" class="edtAppointmentShow btn btn-warning">' + lns.getText('n30') + '</button></div>');  
+    }
+
     cardBody.append(br.clone());
     cardBody.append(divider.clone());
 

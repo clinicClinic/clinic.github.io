@@ -135,6 +135,7 @@ function addAppointment(appointment, callback) {
   pool.query(sql, [appointment.doctor_id, appointment.clinic_id, appointment.patient_id, appointment.specialty, appointment.date, 1], function (error, results) {
     if (error) throw error;
     callback(results);
+    emitAppointmentAdded(appointment.clinic_id);
   });
 }
 ///--------------------------------------------------------------------------clinic api---------------------------------------------------------------
@@ -729,7 +730,6 @@ function removeLog(lid, callback) {
     callback("Deleted Successfully");
   });
 }
-
 function emitAppointmentAdded(id) {
   // emit msg that appointment addedd to all user with $clinic_id == $id
   for (var a in connections) {

@@ -22,7 +22,7 @@ $(document).ajaxStart(function() {
 //         beforeSend: function (request) {
 //             request.setRequestHeader('authorization', bearerToken);
 //         },
-//         data: '{"appointment":{"specialty":"dentistry","doctor_id":"3","patient_id":"41","date":"2019-5-24 2:00"}}',
+//         data: '{"appointment":{"specialty":"dentistry","doctor_id":"3","clinic_id":"1","patient_id":"41","date":"2019-5-24 2:00"}}',
 //         contentType: 'application/json',
 //         success: function (result) {
 //             callback(result);
@@ -437,7 +437,7 @@ export function socketInit() {
             localStorage.setItem("appointments", JSON.stringify(appointments));
             getDocLogs(function(logs){
                 buildLog();
-
+                audio.play();            
             });
         });
     });
