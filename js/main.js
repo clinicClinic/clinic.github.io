@@ -129,7 +129,7 @@ $(document).ready(function () {
   $(document).on("click", ".minimizeBtn", function () {
     $(this).parent().parent().parent().next().slideToggle();
     req.mobileTest(function(res){
-
+      console.log(res);
     });
   });
   $(document).on("keyup", ".searchDoctorInList", function () {

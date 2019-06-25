@@ -16,12 +16,12 @@ $(document).ajaxStart(function () {
 export function mobileTest(callback){
     var bearerToken = 'bearer ' + localStorage.getItem('token');
     $.ajax({
-        url: "/mobile/addAppointment",
+        url: "/mobile/getDoctor",
         type: "POST",
         beforeSend: function (request) {
             request.setRequestHeader('authorization', bearerToken);
         },
-        data: '{"appointment":{"specialty":"dentistry","doctor_id":"3","clinic_id":"1","patient_id":"41","date":"2019-5-24 2:00"}}',
+        data: '{"doctor_id":"131"}',
         contentType: 'application/json',
         success: function (result) {
             callback(result);

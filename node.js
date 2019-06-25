@@ -104,6 +104,18 @@ app.post('/mobile/getClinicDocs', verifyToken, function (req, res) {
     }
   });
 });
+app.post('/mobile/getDoctor', verifyToken, function (req, res) {
+  jwt.verify(req.token, 'privateKey', function (err, authData) {
+    if (err) {
+      res.sendStatus(403);
+    }
+    else {
+      getDoctor(req.body.doctor_id, function (result) {
+        res.send(result);
+      });
+    }
+  });
+});
 app.post('/mobile/addAppointment', verifyToken, function (req, res) {
   jwt.verify(req.token, 'privateKey', function (err, authData) {
     if (err) {
@@ -123,6 +135,15 @@ function getCityClinics(city, callback) {
     callback(results);
   });
 }
+function getDoctor(id, callback) {
+  sql = 'SELECT doctors_12fdrv.id,user_id,fname,lname,nationality,specialty,gender,address,sec,birth_date,phone,clinic_id FROM doctors_12fdrv inner join users_2er31 on doctors_12fdrv.user_id = users_2er31.id where doctors_12fdrv.id=? and role=4';
+  pool.query(sql, [id], function (error, result) {
+    if (error) throw error;
+    docAppointments(result[0],function(doctor){
+      callback(doctor);
+    })
+  });
+}
 function getClinicDocs(id, callback) {
   sql = 'SELECT doctors_12fdrv.id,user_id,fname,lname,nationality,specialty,gender,address,sec,birth_date,phone,clinic_id FROM doctors_12fdrv inner join users_2er31 on doctors_12fdrv.user_id = users_2er31.id where clinic_id=? and role=4';
   pool.query(sql, [id], function (error, results) {
@@ -135,7 +156,20 @@ function addAppointment(appointment, callback) {
   pool.query(sql, [appointment.doctor_id, appointment.clinic_id, appointment.patient_id, appointment.specialty, appointment.date, 1], function (error, results) {
     if (error) throw error;
     callback(results);
-    emitAppointmentAdded(appointment.clinic_id,appointment.doctor_id);
+    emitAppointmentAdded(appointment.clinic_id, appointment.doctor_id);
+  });
+}
+function docAppointments(doctor,callback) {
+  //fetch all doc appointment
+  var sql = 'SELECT * FROM appointments_3sd3df WHERE doctor_id= ?';
+  pool.query(sql, [doctor.id], function (error, results) {
+    if (error) throw error;
+    doctor["appointments"] = "";
+    for(var a in results){
+      doctor.appointments += results[a].date.toISOString();
+    }
+
+    callback(doctor);    
   });
 }
 ///--------------------------------------------------------------------------clinic api---------------------------------------------------------------
@@ -360,7 +394,7 @@ app.post('/clinic/removeLog', verifyToken, function (req, res) {
       res.sendStatus(403);
     }
     else {
-      removeLog(req.body.lid,req.body.user, function (result) {
+      removeLog(req.body.lid, req.body.user, function (result) {
         res.send(result);
       });
     }
@@ -372,7 +406,7 @@ app.post('/clinic/deleteAppointment', verifyToken, function (req, res) {
       res.sendStatus(403);
     }
     else {
-      deleteAppointment(req.body.aid,req.body.user, function (result) {
+      deleteAppointment(req.body.aid, req.body.user, function (result) {
         res.send(result);
       });
     }
@@ -693,7 +727,7 @@ function deleteUser(id, callback) {
     callback("Deleted Successfully");
   });
 }
-function deleteAppointment(id,user, callback) {
+function deleteAppointment(id, user, callback) {
   sql = ' delete FROM appointments_3sd3df WHERE id = ?';
   pool.query(sql, id, function (error, results) {
     if (error) throw error;
@@ -762,18 +796,18 @@ function insertToClinicLog(clinic_id, log) {
     if (error) throw error;
   });
 }
-function removeLog(lid,user, callback) {
-  if(user.role!=4)
+function removeLog(lid, user, callback) {
+  if (user.role != 4)
     sql = ' DELETE FROM clinic_logs_4fd43 WHERE id = ?';
   else
     sql = ' DELETE FROM logs_45fgre WHERE id = ?';
-  
+
   pool.query(sql, [lid], function (error, res) {
     if (error) throw error;
     callback("Deleted Successfully");
   });
 }
-function emitAppointmentAdded(id,docId) {
+function emitAppointmentAdded(id, docId) {
   // emit msg that appointment addedd to all user with $clinic_id == $id
   for (var a in connections) {
     var clinic_id = connections[a].user.clinic_id;
