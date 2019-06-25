@@ -6,35 +6,34 @@ audio.volume = 0.6;
 // var socket = io();
 // socketInit();
 
-$(document).ajaxStart(function() {
+$(document).ajaxStart(function () {
     // show loader on start
     $('#loadingIcon').show();
-}).ajaxSuccess(function() {
+}).ajaxSuccess(function () {
     // hide loader on success
     $('#loadingIcon').hide();
 });
-// mobileTest();
-// function mobileTest(){
-//     var bearerToken = 'bearer ' + localStorage.getItem('token');
-//     $.ajax({
-//         url: "/mobile/addAppointment",
-//         type: "POST",
-//         beforeSend: function (request) {
-//             request.setRequestHeader('authorization', bearerToken);
-//         },
-//         data: '{"appointment":{"specialty":"dentistry","doctor_id":"3","clinic_id":"1","patient_id":"41","date":"2019-5-24 2:00"}}',
-//         contentType: 'application/json',
-//         success: function (result) {
-//             callback(result);
-//         },
-//         statusCode: {
-//             403: function () {
-//                 localStorage.clear();
-//                 location.reload();
-//             }
-//         }
-//     });
-// }
+export function mobileTest(callback){
+    var bearerToken = 'bearer ' + localStorage.getItem('token');
+    $.ajax({
+        url: "/mobile/addAppointment",
+        type: "POST",
+        beforeSend: function (request) {
+            request.setRequestHeader('authorization', bearerToken);
+        },
+        data: '{"appointment":{"specialty":"dentistry","doctor_id":"3","clinic_id":"1","patient_id":"41","date":"2019-5-24 2:00"}}',
+        contentType: 'application/json',
+        success: function (result) {
+            callback(result);
+        },
+        statusCode: {
+            403: function () {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+    });
+}
 export function login(data, callback) {
     $.ajax({
         url: "/login",
@@ -52,7 +51,7 @@ export function test(callback) {
         type: "POST",
         contentType: 'application/json',
         success: function (result) {
-            
+
         }
     });
 }
@@ -110,17 +109,17 @@ export function getClinicPatients(callback) {
         }
     });
 }
-export function getDocLogs(callback) {
+export function getLogs(callback) {
     var bearerToken = 'bearer ' + localStorage.getItem('token');
     var user = localStorage.getItem('user');
     var user = '{"user":' + user + '}';
     $.ajax({
-        url: "/clinic/getDocLogs",
+        url: "/clinic/getLogs",
         type: "POST",
         beforeSend: function (request) {
             request.setRequestHeader('authorization', bearerToken);
         },
-        data:user,
+        data: user,
         contentType: 'application/json',
         success: function (result) {
             callback(result);
@@ -302,10 +301,34 @@ export function deleteUser(data, callback) {
     });
 }
 export function removeLog(data, callback) {
-    data = '{"lid":"'+data+'"}';
+    var user = localStorage.getItem('user');
+    data = '{"user":'+user+',"lid":"' + data + '"}';
     var bearerToken = 'bearer ' + localStorage.getItem('token');
     $.ajax({
         url: "/clinic/removeLog",
+        type: "POST",
+        beforeSend: function (request) {
+            request.setRequestHeader('authorization', bearerToken);
+        },
+        data: data,
+        contentType: 'application/json',
+        success: function (result) {
+            callback();
+        },
+        statusCode: {
+            403: function () {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+    });
+}
+export function deleteAppointment(data, callback) {
+    var user = localStorage.getItem('user');
+    data = '{"user":'+user+',"aid":"' + data + '"}';
+    var bearerToken = 'bearer ' + localStorage.getItem('token');
+    $.ajax({
+        url: "/clinic/deleteAppointment",
         type: "POST",
         beforeSend: function (request) {
             request.setRequestHeader('authorization', bearerToken);
@@ -386,7 +409,7 @@ export function integratePatient(data, callback) {
         }
     });
 }
-export function updateDoctor(data,callback){
+export function updateDoctor(data, callback) {
     var bearerToken = 'bearer ' + localStorage.getItem('token');
     $.ajax({
         url: "/clinic/updateDoctor",
@@ -407,7 +430,7 @@ export function updateDoctor(data,callback){
         }
     });
 }
-export function updateAppointmentDrugs(data,callback){
+export function updateAppointmentDrugs(data, callback) {
     var bearerToken = 'bearer ' + localStorage.getItem('token');
     $.ajax({
         url: "/clinic/updateAppointmentDrugs",
@@ -430,47 +453,55 @@ export function updateAppointmentDrugs(data,callback){
 }
 //------------------------------------------------------ socket io listeners
 export function socketInit() {
-    var token =  localStorage.getItem('token');
-    var socket = io({query: {token: token}});
+    var token = localStorage.getItem('token');
+    var socket = io({ query: { token: token } });
     socket.on('appointment added', function (msg) {
         getAppointments(function (appointments) {
             localStorage.setItem("appointments", JSON.stringify(appointments));
-            getDocLogs(function(logs){
-                buildLog();
-                audio.play();            
+            getLogs(function (logs) {
+                buildLog(logs);
+                audio.play();
+            });
+        });
+    });
+    socket.on('doc appointment added', function (msg) {
+        getDocAppointments(function (appointments) {
+            localStorage.setItem("appointments", JSON.stringify(appointments));
+            getLogs(function (logs) {
+                buildLog(logs);
+                audio.play();
             });
         });
     });
     socket.on('state changed', function (msg) {
         getDocAppointments(function (appointments) {
             localStorage.setItem("appointments", JSON.stringify(appointments));
-            getDocLogs(function(logs){
-            localStorage.setItem("logs", JSON.stringify(logs));
-            buildLog();    
-            audio.play();            
+            getLogs(function (logs) {
+                localStorage.setItem("logs", JSON.stringify(logs));
+                buildLog(logs);
+                audio.play();
             });
         });
     });
 }
 
-function buildLog() {
-    $("#notifications").html("");
-    var logs = obj.getLogs();
+function buildLog(logs) {
+    $("#notifications").html('<h6 class="dropdown-header">Alerts Center</h6>');
     if (logs) {
-      for (var a in logs) {
-        $("#notifications").append(addNotifications(logs[a]));
-      }
+        for (var a in logs) {
+            $("#notifications").append(addNotifications(logs[a]));
+        }
     }
-  }
+}
 function addNotifications(log) {
-return '<a class="dropdown-item d-flex align-items-center" >\
+    return '<a class="dropdown-item d-flex align-items-center" >\
             <div class="mr-3">\
             <div class="icon-circle bg-primary">\
                 <i class="fas fa-file-alt text-white"></i>\
             </div>\
             </div>\
             <div>\
-            <div class="row"><div class="col-md-10"><div class="small text-gray-500">Today:just now</div></div><div class="col-md-2"><lable lid="'+log.id+'"class="removeLog clickable pull-right">X</lable></div></div>\
+            <div class="row"><div class="col-md-10"><div class="small text-gray-500">Today:just now</div></div><div class="col-md-2"><lable lid="'+ log.id + '"class="removeLog clickable pull-right">X</lable></div></div>\
             <span class="font-weight-bold">'+ log.cont + '</span>\
             </div>\
         </a>';

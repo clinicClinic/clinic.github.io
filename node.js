@@ -135,7 +135,7 @@ function addAppointment(appointment, callback) {
   pool.query(sql, [appointment.doctor_id, appointment.clinic_id, appointment.patient_id, appointment.specialty, appointment.date, 1], function (error, results) {
     if (error) throw error;
     callback(results);
-    emitAppointmentAdded(appointment.clinic_id);
+    emitAppointmentAdded(appointment.clinic_id,appointment.doctor_id);
   });
 }
 ///--------------------------------------------------------------------------clinic api---------------------------------------------------------------
@@ -287,11 +287,8 @@ app.post('/clinic/addAppointment', verifyToken, function (req, res) {
     }
     else {
       // console.log(req.body.appointment);
-
       insertAppointment(req.body.user, req.body.appointment, function (result) {
         res.send(result);
-        emitAppointmentAdded(req.body.user.clinic_id);
-        emitToDoc(req.body.appointment.doctor);
       });
     }
   });
@@ -363,7 +360,19 @@ app.post('/clinic/removeLog', verifyToken, function (req, res) {
       res.sendStatus(403);
     }
     else {
-      removeLog(req.body.lid, function (result) {
+      removeLog(req.body.lid,req.body.user, function (result) {
+        res.send(result);
+      });
+    }
+  });
+});
+app.post('/clinic/deleteAppointment', verifyToken, function (req, res) {
+  jwt.verify(req.token, 'privateKey', function (err, authData) {
+    if (err) {
+      res.sendStatus(403);
+    }
+    else {
+      deleteAppointment(req.body.aid,req.body.user, function (result) {
         res.send(result);
       });
     }
@@ -382,13 +391,13 @@ app.post('/clinic/updateAppointmentDrugs', verifyToken, function (req, res) {
     }
   });
 });
-app.post('/clinic/getDocLogs', verifyToken, function (req, res) {
+app.post('/clinic/getLogs', verifyToken, function (req, res) {
   jwt.verify(req.token, 'privateKey', function (err, authData) {
     if (err) {
       res.sendStatus(403);
     }
     else {
-      getDocLogs(req.body.user, function (result) {
+      getLogs(req.body.user, function (result) {
         res.send(result);
       });
     }
@@ -563,7 +572,7 @@ function insertAppointment(user, appointment, callback) {
   pool.query(sql, [appointment.doctor, user.clinic_id, appointment.patient, appointment.specialty, appointment.comment, date, 0, user.id], function (error, results) {
     if (error) throw error;
     callback("Added Successfully");
-    emitAppointmentAdded(user.clinic_id);
+    emitAppointmentAdded(user.clinic_id, appointment.doctor);
   });
 }
 function editAppointment(user, appointment, callback) {
@@ -684,6 +693,13 @@ function deleteUser(id, callback) {
     callback("Deleted Successfully");
   });
 }
+function deleteAppointment(id,user, callback) {
+  sql = ' delete FROM appointments_3sd3df WHERE id = ?';
+  pool.query(sql, id, function (error, results) {
+    if (error) throw error;
+    callback("Deleted Successfully");
+  });
+}
 function updateDoctor(doctor, callback) {
   sql = ' UPDATE doctors_12fdrv SET specialty=?,address=?,nationality=?,birth_date=?,gender=?,sec=? WHERE id=?';
   pool.query(sql, [doctor.specialty, doctor.address, doctor.nationality, doctor.birth_date, doctor.gender, doctor.sec, doctor.id], function (error, ress) {
@@ -706,31 +722,58 @@ function updateAppointmentDrugs(data, callback) {
     }
   });
 }
-function getDocLogs(user, callback) {
-  sql = ' SELECT * FROM logs_45fgre WHERE user_id=?';
-  pool.query(sql, [user.id], function (error, results) {
-    if (error) {
-      throw error;
-    }
-    else {
-      callback(results);
-    }
+function getLogs(user, callback) {
+  if (user.role == 4) {
+    sql = ' SELECT * FROM logs_45fgre WHERE user_id=?';
+    pool.query(sql, [user.id], function (error, results) {
+      if (error) {
+        throw error;
+      }
+      else {
+        callback(results);
+      }
+    });
+  } else {
+    sql = ' SELECT * FROM clinic_logs_4fd43 WHERE clinic_id=?';
+    pool.query(sql, [user.clinic_id], function (error, results) {
+      if (error) {
+        throw error;
+      }
+      else {
+        callback(results);
+      }
+    });
+  }
+
+}
+function insertToDocLog(docId, log) {
+  var sql0 = 'SELECT * FROM  doctors_12fdrv WHERE id =?';
+  pool.query(sql0, [docId], function (error0, results0) {
+    if (error0) throw erro0r;
+    sql = ' INSERT INTO logs_45fgre(user_id, cont) VALUES(?,?)';
+    pool.query(sql, [results0[0].user_id, log], function (error, res) {
+      if (error) throw error;
+    });
   });
 }
-function insertLog(userId, log) {
-  sql = ' INSERT INTO logs_45fgre(user_id, cont) VALUES(?,?)';
-  pool.query(sql, [userId, log], function (error, res) {
+function insertToClinicLog(clinic_id, log) {
+  sql = ' INSERT INTO clinic_logs_4fd43(clinic_id, cont) VALUES(?,?)';
+  pool.query(sql, [clinic_id, log], function (error, res) {
     if (error) throw error;
   });
 }
-function removeLog(lid, callback) {
-  sql = ' DELETE FROM  logs_45fgre WHERE id = ?';
+function removeLog(lid,user, callback) {
+  if(user.role!=4)
+    sql = ' DELETE FROM clinic_logs_4fd43 WHERE id = ?';
+  else
+    sql = ' DELETE FROM logs_45fgre WHERE id = ?';
+  
   pool.query(sql, [lid], function (error, res) {
     if (error) throw error;
     callback("Deleted Successfully");
   });
 }
-function emitAppointmentAdded(id) {
+function emitAppointmentAdded(id,docId) {
   // emit msg that appointment addedd to all user with $clinic_id == $id
   for (var a in connections) {
     var clinic_id = connections[a].user.clinic_id;
@@ -738,9 +781,13 @@ function emitAppointmentAdded(id) {
     if (clinic_id == id && role <= 3) {
       var currSocket = connections[a].socket;
       currSocket.emit("appointment added", "");
+    } else if (clinic_id == id && role == 4) {
+      var currSocket = connections[a].socket;
+      currSocket.emit("doc appointment added", "");
     }
   }
-
+  insertToClinicLog(id, "new appointment added");
+  insertToDocLog(docId, "new appointment added");
 }
 function emitToDoc(id) {
   var sql = 'SELECT * FROM  doctors_12fdrv WHERE id =?';
@@ -749,7 +796,7 @@ function emitToDoc(id) {
     var userId = results[0].user_id;
     if (connections[userId]) {
       var currSocket = connections[userId].socket;
-      insertLog(userId, "appointment added");
+      insertToDocLog(userId, "appointment added");
       currSocket.emit("appointment added", "");
     }
   });
@@ -760,7 +807,7 @@ function emitStat(id, stat) {
   pool.query(sql, [id], function (error, results) {
     if (error) throw error;
     var userId = results[0].user_id;
-    insertLog(userId, "appointment on" + results[0].date + "changed to" + stat);
+    insertToDocLog(userId, "appointment on" + results[0].date + "changed to" + stat);
     if (connections[userId]) {
       var currSocket = connections[userId].socket;
       currSocket.emit("state changed", "appointment on " + results[0].date + " changed to " + stat);

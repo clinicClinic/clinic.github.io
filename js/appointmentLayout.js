@@ -60,7 +60,7 @@ $(document).on("click", ".editAppInpBtn", function () {
   });
 });
 $(document).on("click", ".changeStatBtn", function () {
-  if (!confirm("you sure bto ?")) return;
+  if (!confirm("you sure you want to change the status of this appointment ?")) return;
   var id = $(this).attr("aid");
   var stat = $(this).attr("stat");
   var user = localStorage.getItem('user');
@@ -126,6 +126,7 @@ $(document).on("click", ".addDrugBtn", function () {
     });
   });
 });
+
 //functions
 function buildEditAppointmentCard(appointment, patients, doctors) {
   if (!patients || !doctors || !appointment)
@@ -306,7 +307,7 @@ function buildAppointmentCard(appointment) {
   } else {
     if(appointment.isBy==0){
       cardBody.append(br.clone());
-      cardBody.append('<div class="row"><label class="col-sm-2 col-form-label"></label><button aid="' + appointment.id + '" class="edtAppointmentShow btn btn-warning">' + lns.getText('n30') + '</button></div>');  
+      cardBody.append('<div class="row"><label class="col-sm-2 col-form-label"></label><button aid="' + appointment.id + '" class="edtAppointmentShow btn btn-warning">' + lns.getText('n30') + '</button><button aid="' + appointment.id + '" class="deleteAppointment btn btn-danger">' + lns.getText('n73') + '</button></div>');  
     }
 
     cardBody.append(br.clone());

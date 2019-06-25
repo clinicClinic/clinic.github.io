@@ -128,6 +128,9 @@ $(document).ready(function () {
   });
   $(document).on("click", ".minimizeBtn", function () {
     $(this).parent().parent().parent().next().slideToggle();
+    req.mobileTest(function(res){
+
+    });
   });
   $(document).on("keyup", ".searchDoctorInList", function () {
     var inp = $(this).val();
@@ -324,8 +327,19 @@ $(document).ready(function () {
     var id = $(this).attr('lid');
     $(this).parent().parent().parent().parent().remove();
     req.removeLog(id, function (res) {
-      req.getDocLogs(function (logs) {
+      req.getLogs(function (logs) {
         localStorage.setItem('logs', JSON.stringify(logs));
+      });
+    });
+  });
+  $(document).on("click", ".deleteAppointment", function () {
+    if (!confirm("you sure you want to delete this appointment ?")) return;
+    var id = $(this).attr("aid");
+    req.deleteAppointment(id, function (msg) {
+      cAlert(msg);
+      req.getAppointments(function (appointments) {
+        localStorage.setItem('appointments', JSON.stringify(appointments));
+        transTab('clnd');        
       });
     });
   });
@@ -380,7 +394,8 @@ function docTransTab(nxt) {
     else if (nxt == "clnd") {
       appointmentCont(true);
     }
-    buildLog();
+  buildLog();
+
   });
 
 }
@@ -409,6 +424,8 @@ function transTab(nxt) {
     else if (nxt == "users") {
       usersCont();
     }
+  buildLog();
+
   });
 
 }
@@ -1336,12 +1353,15 @@ function loadClinicData(callback) {
         req.getClinicPatients(function (patients) {
           req.getAppointments(function (appointments) {
             req.getClinicUsers(function (users) {
-              localStorage.setItem('clinic', JSON.stringify(clinic));
-              localStorage.setItem('doctors', JSON.stringify(doctors));
-              localStorage.setItem('patients', JSON.stringify(patients));
-              localStorage.setItem('appointments', JSON.stringify(appointments));
-              localStorage.setItem('users', JSON.stringify(users));
-              callback();
+              req.getLogs(function (logs) {
+                localStorage.setItem('clinic', JSON.stringify(clinic));
+                localStorage.setItem('doctors', JSON.stringify(doctors));
+                localStorage.setItem('patients', JSON.stringify(patients));
+                localStorage.setItem('appointments', JSON.stringify(appointments));
+                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('logs', JSON.stringify(logs));
+                callback();
+              });
             });
           });
         });
@@ -1365,7 +1385,7 @@ function loadDocData(callback) {
         req.getClinicPatients(function (patients) {
           req.getDocAppointments(function (appointments) {
             req.getClinicUsers(function (users) {
-              req.getDocLogs(function (logs) {
+              req.getLogs(function (logs) {
                 localStorage.setItem('clinic', JSON.stringify(clinic));
                 localStorage.setItem('doctors', JSON.stringify(doctors));
                 localStorage.setItem('patients', JSON.stringify(patients));
@@ -1838,6 +1858,7 @@ function buildUsersListBody(clinicUsers) {
 function buildLog() {
   var logs = obj.getLogs();
   if (logs) {
+    $("#notifications").html('<h6 class="dropdown-header">Alerts Center</h6>');
     for (var a in logs) {
       $("#notifications").append(addNotifications(logs[a]));
     }

@@ -80,6 +80,7 @@ var selectedLang = {
     n70: "Add new Drug ",
     n71: "Drug ",
     n72: "Drugs ",
+    n73: "Delete ",
 
   },
   ar: {
@@ -156,6 +157,8 @@ var selectedLang = {
     n70: "إضافة عقار جديد ",
     n71: "دواء",
     n72: "الادوية ",
+    n73: "حذف ",
+
 
 
 }
